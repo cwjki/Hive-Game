@@ -10,7 +10,10 @@ init() :- random(0, 2, R1), new_player("Jugador", R1, 1, 3, 3, 2, 2, 1, 1, 1), R
           writeln("").
 
 
-printInfo(Name, Color).
+printInfo(Name, Color) :- writeln("Turno de "), write($Name), write(", fichas "), write($Color).
+
+
+
 
 choose_option(Option) :- writeln("Seleccione el tipo de jugada a realizar:"),
                          writeln("1 - Colocar pieza nueva en el tablero"),
@@ -21,27 +24,27 @@ choose_option(Option) :- writeln("Seleccione el tipo de jugada a realizar:"),
 
 
 
-choose_hand_piece(Option) :- get_color(Color), get_player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs),
+choose_hand_piece(Piece) :- get_color(Color), get_player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs),
                              writeln("Seleccione que bicho desea agregar al tablero"),
-                             QueenBee > 0 -> writeln("1 - Abeja Reina");                           
-                             Ants > 0 -> writeln("2 - Hormiga");
-                             Grasshoppers > 0 -> writeln("3 - Saltamontes");
-                             Scarabs > 0 -> writeln("4 - Escarabajo");
-                             Spiders > 0 -> writeln("5 - Araña");
-                             Mosquitos > 0 -> writeln("6 - Mosquito");
-                             Ladybugs > 0 -> writeln("7 - Mariquita");
-                             Pillbugs > 0 -> writeln("8 - Bicho Bola");
-                             read(Option),
-                             writeln("")
+                             (QueenBee > 0     -> writeln("1 - Abeja Reina"); true),                         
+                             (Ants > 0         -> writeln("2 - Hormiga"); true),
+                             (Grasshoppers > 0 -> writeln("3 - Saltamontes"); true),
+                             (Scarabs > 0      -> writeln("4 - Escarabajo"); true),
+                             (Spiders > 0      -> writeln("5 - Araña"); true),
+                             (Mosquitos > 0    -> writeln("6 - Mosquito"); true),
+                             (Ladybugs > 0     -> writeln("7 - Mariquita"); true),
+                             (Pillbugs > 0     -> writeln("8 - Bicho Bola"); true),
+                             read(Piece),
+                             writeln("").
 
 
-play_new_piece() :- choose_hand_piece(Option).
+play_new_piece() :- choose_hand_piece(Piece). 
 
-move_piece()
+move_piece().
 
 next_move_player() :- choose_option(Option),
                       Option =:= 1 -> play_new_piece();
-                      Option =:= 2 -> move_piece()
+                      Option =:= 2 -> move_piece().
                       
 
 next_move_pc() :- writeln("Pc").

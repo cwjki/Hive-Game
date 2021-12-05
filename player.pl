@@ -17,7 +17,7 @@ get_current_scarabs(player(_, _, _, _, _, Scarabs, _, _, _, _), Scarabs).
 get_current_spiders(player(_, _, _, _, _, _, Spiders, _, _, _), Spiders).
 get_current_mosquitos(player(_, _, _, _, _, _, _, Mosquitos, _, _), Mosquitos).
 get_current_ladybugs(player(_, _, _, _, _, _, _, _, Ladybugs, _), Ladybugs).
-get_current_pillbugs(player(_, , _, _, _, _, _, _, _, Pillbugs), Pillbugs).
+get_current_pillbugs(player(_, _, _, _, _, _, _, _, _, Pillbugs), Pillbugs).
 
 update_player_queenBee(player(Name, Color, _, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), ActualQueenBee,
                         player(Name, Color, ActualQueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs)).
