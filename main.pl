@@ -17,5 +17,8 @@ main() :- start(Input), (Input =:= 1 -> playerVsPC(), main();
 
 
 
-playerVsPC() :- writeln("PVPC").
+playerVsPC() :- writeln("PVPC"),
+                
+
+                
 playerVsPlayer() :- writeln("PVP").
