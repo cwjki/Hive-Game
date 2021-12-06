@@ -1,3 +1,4 @@
+:- module(player, [new_player/1, get_player/2]).
 
 :- dynamic player/10.
 
@@ -86,5 +87,4 @@ update_player_hand(Bug, Player, NewPlayer) :- ( Bug =:= 0 -> (get_current_queenB
                                                             new_player(NewPlayer))
                                                 ).
 
-:- module(player, [new_player/1, update_player_hand/3]).
 

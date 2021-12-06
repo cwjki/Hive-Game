@@ -14,7 +14,9 @@ get_hex_color(hex(_, _, _, Color), Color).
 
 get_hex(hex(Row, Column, Bug, Color), hex(Row, Column, Bug, Color)) :- hex(Row, Column, Bug, Color).
 
-get_all_hexs(Hexs) :- findall(Hex, get_hex(Hex, _), Hexs).
+get_all_hexs(Hexs) :- findall(Hex, get_hex(_, Hex), Hexs).
+
+get_hex_by_color(Color, Hexs) :- findall(Hex, get_hex(hex(_, _, _, Color), Hex), Hexs).
 
 get_neighbour1(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row - 1, NeighbourColumn is Column + 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
 get_neighbour2(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 1, NeighbourColumn is Column + 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
@@ -32,7 +34,4 @@ get_neighbour(Hex, Neighbour) :- get_neighbour1(Hex, Neighbour);
 
 get_all_neighbours(Hex, Neighbours) :- findall(Neighbour, get_neighbour(Hex, Neighbour), Neighbours).
 
-
-
-:- module(hexagon, [new_hex/4, remove_hex/4, get_hex_row/2, get_hex_column/2, get_hex_bug/2, get_hex_color/2, get_hex/2, get_all_hexs/1]).
 
