@@ -11,8 +11,8 @@ get_color(Color) :- color(Color).
 update_color(NewColor) :- color(OldColor), 
                   Aux is OldColor + 1,
                   NewColor is Aux mod 2,
-                  assertz(color(NewColor)),
-                  retract(color(OldColor)).
+                  retract(color(OldColor)),
+                  assertz(color(NewColor)).
 
 
 init_turn() :- assertz(turn(1)).

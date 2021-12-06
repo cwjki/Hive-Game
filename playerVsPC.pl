@@ -5,7 +5,7 @@
 
 
 
-init() :- random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is R1-1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)),
+init() :- random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)),
           init_color(),
           init_turn(),
           writeln("Comienza la partida, el color de las fichas fue asignado aleatoriamente."),
@@ -53,7 +53,7 @@ move_one_piece() :- writeln("Simular mover una ficha").
 
 next_move_player() :- choose_option(Option),
                       (Option =:= 1 -> play_new_piece();
-                       Option =:= 2 -> move_one_piece(), true).
+                       Option =:= 2 -> move_one_piece()).
                       
 
 next_move_pc() :- writeln("Simular Partida de la PC.").
@@ -65,7 +65,7 @@ play(Color, Turn) :- get_player(player(Name, Color, QueenBee, Ants, Grasshoppers
                      printInfo(Name, Color), 
                      next_move(Name),
                      update_turn(NewTurn),
-                     update_color(NewColor),
+                     update_color(NewColor),               
                      play(NewColor, NewTurn).
 
 playerVsPC() :- init(), play(0, 1).
