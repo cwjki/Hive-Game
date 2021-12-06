@@ -16,6 +16,23 @@ get_hex(hex(Row, Column, Bug, Color), hex(Row, Column, Bug, Color)) :- hex(Row, 
 
 get_all_hexs(Hexs) :- findall(Hex, get_hex(Hex, _), Hexs).
 
+get_neighbour1(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row - 1, NeighbourColumn is Column + 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
+get_neighbour2(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 1, NeighbourColumn is Column + 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
+get_neighbour3(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 2, Neighbour = hex(NeighbourRow, Column, _, _).
+get_neighbour4(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 1, NeighbourColumn is Column - 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
+get_neighbour5(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row - 1, NeighbourColumn is Column - 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
+get_neighbour6(hex(Row, Column, _, _), Neighbour) :- NeighbourColumn is Column + 2, Neighbour = hex(Row, NeighbourColumn, _, _).
+
+get_neighbour(Hex, Neighbour) :- get_neighbour1(Hex, Neighbour);                                                     
+                                 get_neighbour2(Hex, Neighbour);
+                                 get_neighbour3(Hex, Neighbour);
+                                 get_neighbour4(Hex, Neighbour);
+                                 get_neighbour5(Hex, Neighbour);
+                                 get_neighbour6(Hex, Neighbour).
+
+get_all_neighbours(Hex, Neighbours) :- findall(Neighbour, get_neighbour(Hex, Neighbour), Neighbours).
+
+
 
 :- module(hexagon, [new_hex/4, remove_hex/4, get_hex_row/2, get_hex_column/2, get_hex_bug/2, get_hex_color/2, get_hex/2, get_all_hexs/1]).
 

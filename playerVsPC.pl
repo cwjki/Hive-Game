@@ -40,11 +40,11 @@ choose_hand_piece(Piece) :- get_color(Color), get_player(_, Color, QueenBee, Ant
 
 play_new_piece() :- choose_hand_piece(Piece). 
 
-move_piece().
+move_one_piece().
 
 next_move_player() :- choose_option(Option),
                       Option =:= 1 -> play_new_piece();
-                      Option =:= 2 -> move_piece().
+                      Option =:= 2 -> move_one_piece().
                       
 
 next_move_pc() :- writeln("Pc").
