@@ -1,3 +1,10 @@
+:- module(board, [add_new_piece/1, get_possible_positions/2]).
+
+:- use_module(hexagon).
+:- use_module(player).
+
+
+
 
 get_board(Board) :- get_all_hexs(Board).
 
@@ -10,8 +17,9 @@ move_piece(OriginRow, OriginColumn, DestinyRow, DestinyColumn) :- get_hex(Origin
                                                                   new_hex(DestinyRow, DestinyColumn, Bug, Color).
 
 
-get_possible_positions(Color, Positions).
+get_possible_positions(Color, Positions) :- get_hexs_by_color(Color, SameColorHexs),
+                                            get_possible_moves(SameColorHexs, Positions).
 
-get_possible_moves(Cell, Moves).
+% get_possible_moves(Cell, Moves)
 
 

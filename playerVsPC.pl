@@ -2,7 +2,8 @@
 
 :- use_module(player).
 :- use_module(utils).
-
+:- use_module(board).
+:- use_module(hexagon).
 
 
 init() :- random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)),
@@ -22,8 +23,6 @@ printInfo(Name, Color) :- writeln(""),
                           writeln("").
 
 
-
-
 choose_option(Option) :- writeln("Seleccione el tipo de jugada a realizar:"),
                          writeln("1 - Colocar pieza nueva en el tablero"),
                          writeln("2 - Mover pieza en el tablero"),
@@ -31,9 +30,7 @@ choose_option(Option) :- writeln("Seleccione el tipo de jugada a realizar:"),
                          writeln("").
 
 
-
-
-choose_hand_piece(Piece) :- get_color(Color), get_player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs),
+choose_hand_piece(Piece) :- get_color(Color), get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
                              writeln("Seleccione que bicho desea agregar al tablero"),
                              (QueenBee > 0     -> writeln("1 - Abeja Reina"); true),                         
                              (Ants > 0         -> writeln("2 - Hormiga"); true),
@@ -47,13 +44,46 @@ choose_hand_piece(Piece) :- get_color(Color), get_player(_, Color, QueenBee, Ant
                              writeln("").
 
 
-play_new_piece() :- choose_hand_piece(Piece). 
+
+choose_positions_aux([],Count) :- Count = 0.
+choose_positions_aux([X|Positions], NewCount) :- get_hex_row(X,Row),
+                                                 get_hex_column(X, Column),
+                                                 choose_positions_aux(Positions, Count),
+                                                 NewCount is Count + 1,
+                                                 write(NewCount), write("- "), write("["), write(Row), write(", "), write(Column), write("]"),
+                                                 writeln("").
+
+
+choose_position(Color, ChoosenHex) :- writeln("Seleccione en que coordenadas desea colocar la ficha."),
+                                       get_possible_positions(Color, Positions),
+                                       choose_positions_aux(Positions, TotalOptions),
+                                       read(Option),
+                                       reverse(Positions, X, []),
+                                       nth1(Option, X, ChoosenHex),
+                                       writeln(ChoosenHex).
+                                       
+
+                
+
+play_new_piece() :- get_color(Color), choose_hand_piece(Piece), choose_position(Color, ChoosenHex),
+                    get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
+                    add_new_piece(hex(Row, Column, Piece, Color)),
+                    writeln("Simular que se puso uno ficha.").
 
 move_one_piece() :- writeln("Simular mover una ficha").
 
-next_move_player() :- choose_option(Option),
-                      (Option =:= 1 -> play_new_piece();
-                       Option =:= 2 -> move_one_piece()).
+first_play() :- writeln("Primera jugada").
+second_play() :- writeln("Segunda jugada").
+
+next_move_player() :-  get_turn(Turn),
+                       (Turn =:= 1 -> first_play();
+                        Turn =:= 2 -> second_play();
+                        Turn >=  2 -> (choose_option(Option),
+                        (Option =:= 1 -> play_new_piece();
+                        Option =:= 2 -> move_one_piece()))
+                        ).
+                       
+                       
                       
 
 next_move_pc() :- writeln("Simular Partida de la PC.").
