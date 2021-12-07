@@ -1,4 +1,4 @@
-:- module(board, [add_new_piece/1, get_possible_positions/2]).
+:- module(board, [add_new_piece/1, get_possible_positions/2, get_board/1]).
 
 :- use_module(hexagon).
 :- use_module(player).
