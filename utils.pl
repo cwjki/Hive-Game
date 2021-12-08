@@ -10,21 +10,23 @@ init_color() :- assertz(color(0)).
 
 get_color(Color) :- color(Color).
 
-update_color(NewColor) :- color(OldColor), 
-                  Aux is OldColor + 1,
-                  NewColor is Aux mod 2,
-                  retract(color(OldColor)),
-                  assertz(color(NewColor)).
+update_color(NewColor) :- 
+    color(OldColor), 
+    Aux is OldColor + 1,
+    NewColor is Aux mod 2,
+    retract(color(OldColor)),
+    assertz(color(NewColor)).
 
 % Turn 
 init_turn() :- assertz(turn(1)).
 
 get_turn(Turn) :- turn(Turn).
 
-update_turn(NewTurn) :- turn(Turn),
-                        NewTurn is Turn + 1,
-                        assertz(turn(NewTurn)),
-                        retract(turn(Turn)).
+update_turn(NewTurn) :- 
+    turn(Turn),
+    NewTurn is Turn + 1,
+    assertz(turn(NewTurn)),
+    retract(turn(Turn)).
 
 % TOOLS
 reverse([],Z,Z).

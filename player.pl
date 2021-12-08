@@ -45,46 +45,47 @@ update_player_pillbugs(player(Name, Color, QueenBee, Ants, Grasshoppers, Scarabs
                     player(Name, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, ActualPillbugs)).
 
 
-update_player_hand(Bug, Player, NewPlayer) :- ( Bug =:= 1 -> (get_current_queenBee(Player, QueenBee), 
-                                                            ActualQueenBee is QueenBee - 1,
-                                                            update_player_queenBee(Player, ActualQueenBee, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 2 -> (get_current_ants(Player, Ants), 
-                                                            ActualAnts is Ants - 1,
-                                                            update_player_ants(Player, ActualAnts, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 3 -> (get_current_grasshoppers(Player, Grasshoppers), 
-                                                            ActualGrasshoppers is Grasshoppers - 1,
-                                                            update_player_grasshoppers(Player, ActualGrasshoppers, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 4 -> (get_current_scarabs(Player, Scarabs), 
-                                                            ActualScarabs is Scarabs - 1,
-                                                            update_player_scarabs(Player, ActualScarabs, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 5 -> (get_current_spiders(Player, Spiders), 
-                                                            ActualSpiders is Spiders - 1,
-                                                            update_player_spiders(Player, ActualSpiders, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 6 -> (get_current_mosquitos(Player, Mosquitos), 
-                                                            ActualMosquitos is Mosquitos - 1,
-                                                            update_player_mosquitos(Player, ActualMosquitos, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 7 -> (get_current_ladybugs(Player, Ladybugs), 
-                                                            ActualLadybugs is Ladybugs - 1,
-                                                            update_player_ladybugs(Player, ActualLadybugs, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer));
-                                                Bug =:= 8 -> (get_current_pillbugs(Player, Pillbugs), 
-                                                            ActualPillbugs is Pillbugs - 1,
-                                                            update_player_pillbugs(Player, ActualPillbugs, NewPlayer),
-                                                            remove_player(Player),
-                                                            new_player(NewPlayer))
-                                                ).
+update_player_hand(Bug, Player, NewPlayer) :- 
+    (Bug =:= 1 -> (get_current_queenBee(Player, QueenBee), 
+        ActualQueenBee is QueenBee - 1,
+        update_player_queenBee(Player, ActualQueenBee, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 2 -> (get_current_ants(Player, Ants), 
+        ActualAnts is Ants - 1,
+        update_player_ants(Player, ActualAnts, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 3 -> (get_current_grasshoppers(Player, Grasshoppers), 
+        ActualGrasshoppers is Grasshoppers - 1,
+        update_player_grasshoppers(Player, ActualGrasshoppers, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 4 -> (get_current_scarabs(Player, Scarabs), 
+        ActualScarabs is Scarabs - 1,
+        update_player_scarabs(Player, ActualScarabs, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 5 -> (get_current_spiders(Player, Spiders), 
+        ActualSpiders is Spiders - 1,
+        update_player_spiders(Player, ActualSpiders, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 6 -> (get_current_mosquitos(Player, Mosquitos), 
+        ActualMosquitos is Mosquitos - 1,
+        update_player_mosquitos(Player, ActualMosquitos, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 7 -> (get_current_ladybugs(Player, Ladybugs), 
+        ActualLadybugs is Ladybugs - 1,
+        update_player_ladybugs(Player, ActualLadybugs, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer));
+    Bug =:= 8 -> (get_current_pillbugs(Player, Pillbugs), 
+        ActualPillbugs is Pillbugs - 1,
+        update_player_pillbugs(Player, ActualPillbugs, NewPlayer),
+        remove_player(Player),
+        new_player(NewPlayer))
+    ).
 
 
