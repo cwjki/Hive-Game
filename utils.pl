@@ -5,6 +5,7 @@
 :- dynamic color/1.
 :- dynamic turn/1.
 
+% Color
 init_color() :- assertz(color(0)).
 
 get_color(Color) :- color(Color).
@@ -15,7 +16,7 @@ update_color(NewColor) :- color(OldColor),
                   retract(color(OldColor)),
                   assertz(color(NewColor)).
 
-
+% Turn 
 init_turn() :- assertz(turn(1)).
 
 get_turn(Turn) :- turn(Turn).
@@ -26,7 +27,6 @@ update_turn(NewTurn) :- turn(Turn),
                         retract(turn(Turn)).
 
 % TOOLS
-
 reverse([],Z,Z).
 reverse([H|T],Z,Acc) :- reverse(T,Z,[H|Acc]).
 

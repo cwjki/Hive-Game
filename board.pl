@@ -1,4 +1,5 @@
-:- module(board, [add_new_piece/1, get_possible_positions/2, get_board/1]).
+:- module(board, [add_new_piece/1, get_possible_positions/2, get_board/1,
+                  its_the_queen_on_the_table/1]).
 
 :- use_module(hexagon).
 :- use_module(player).
@@ -19,6 +20,8 @@ move_piece(OriginRow, OriginColumn, DestinyRow, DestinyColumn) :- get_hex(Origin
 
 get_possible_positions(Color, Positions) :- get_hexs_by_color(Color, SameColorHexs),
                                             get_possible_moves(SameColorHexs, Positions).
+
+its_the_queen_on_the_table(Color) :- get_hex(hex(_, _, 1, Color), _).
 
 % get_possible_moves(Cell, Moves)
 
