@@ -48,11 +48,11 @@ player_choose_hand_piece(Piece) :-
 
 
 
-player_choose_positions_aux([],Count) :- Count = 0.
-player_choose_positions_aux([X|Positions], NewCount) :- 
+print_positions([],Count) :- Count = 0.
+print_positions([X|Positions], NewCount) :- 
     get_hex_row(X,Row),
     get_hex_column(X, Column),
-    player_choose_positions_aux(Positions, Count),
+    print_positions(Positions, Count),
     NewCount is Count + 1,
     write(NewCount), write("- "), write("["), write(Row), write(", "), write(Column), write("]"),
     writeln("").
@@ -61,19 +61,47 @@ player_choose_positions_aux([X|Positions], NewCount) :-
 player_choose_position(Color, ChoosenHex) :- 
     writeln("Seleccione en que coordenadas desea colocar la ficha."),
     get_possible_positions(Color, Positions),
-    player_choose_positions_aux(Positions, TotalOptions),
+    print_positions(Positions, TotalOptions),
     read(Option),
     reverse(Positions, X, []),
     nth1(Option, X, ChoosenHex),
     writeln("").
-                                                    
+
+player_choose_board_piece(Color, ChoosenHex) :-
+    writeln("Seleccione la ficha que desea mover:"),
+    get_hexs_by_color(Color, Hexs),
+    print_positions(Hexs, TotalOptions),
+    read(Option),
+    reverse(Hexs, X, []),
+    nth1(Option, X, ChoosenHex),
+    writeln("").
+
+                                           
 player_play_new_piece() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
     add_new_piece(hex(Row, Column, Piece, Color, 0)).
     
 
-player_move_one_piece() :- writeln("Simular mover una ficha").
+player_choose_piece_destiny(OriginHex, DestinyHex) :-
+    writeln("Seleccione la casilla destino para su ficha:"),
+    get_possible_moves(OriginHex, PossibleDestinies),
+    print_positions(PossibleDestinies, TotalOptions),
+    read(Option),
+    reverse(PossibleDestinies, X, []),
+    nth1(Option, X, DestinyHex),
+    writeln("").
+
+
+player_move_one_piece() :- 
+    get_color(Color),
+    player_choose_board_piece(Color, OriginHex),
+    player_choose_piece_destiny(OriginHex, DestinyHex),
+    move_piece(OriginHex, DestinyHex).
+
+
+    
+
 
 
 print_neighbours_options(Option) :- 

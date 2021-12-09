@@ -1,13 +1,39 @@
-:- module(hexagon, [get_hex/2, new_hex/1, remove_hex/1, get_all_hexs/1,
+:- module(hexagon, [get_hex/2, new_hex/1,
+                    remove_hex/1, get_all_hexs/1,
                     get_hex_row/2, get_hex_column/2,
-                    get_hexs_by_color/2, get_possible_moves/2,
+                    get_hex_color/2, get_hex_level/2,
+                    get_hexs_by_color/2, get_free_positions/2,
+                    get_empty_neighbours/2,
+                    get_neighbours/2,
+                    get_hex_bug/2,
                     dfs/2]).
 
 :- dynamic hex/5.
+:- dynamic uselessHex/5.
 
-new_hex(hex(Row, Column, Bug, Color, Level)) :- assertz(hex(Row, Column, Bug, Color, Level)).
+new_hex(hex(Row, Column, Bug, Color, Level)) :- 
+    not(get_hex(hex(Row, Column, _, _, _), Hex)),
+    assertz(hex(Row, Column, Bug, Color, Level)), !.
 
-remove_hex(hex(Row, Column, Bug, Color, Level)) :- retract(hex(Row, Column, Bug, Color, Level)).
+new_hex(hex(Row, Column, Bug, Color, Level)) :- 
+    get_hex(hex(Row, Column, OldBug, OldColor, OldLevel), OldHex),
+    new_useless_hex(OldHex),
+    remove_hex(OldHex),
+    NewLevel is OldLevel + 1,
+    assertz(hex(Row, Column, Bug, Color, NewLevel)).
+
+
+remove_hex(hex(Row, Column, Bug, Color, Level)) :- 
+    Level =:= 0, 
+    retract(hex(Row, Column, Bug, Color, Level)), !.
+
+remove_hex(hex(Row, Column, Bug, Color, Level)) :-
+    retract(hex(Row, Column, Bug, Color, Level)),
+    NewLevel is Level - 1,
+    get_useless_hex(uselessHex(Row, Column, NewBug, NewColor, NewLevel), NewHex),
+    remove_useless_hex(NewHex),
+    assertz(hex(Row, Column, NewBug, NewColor, NewLevel)).
+
 
 get_hex_row(hex(Row, _, _, _, _), Row).
 
@@ -50,7 +76,7 @@ get_empty_neighbours_aux(hex(Row, Column, _, _, _), [X|DirR], [Y|DirC], EmptyNei
     NewRow is Row + X,
     NewColumn is Column + Y,
     ((not(get_hex(hex(NewRow, NewColumn, _, _, _),_)),
-    Empty_N = [hex(NewRow, NewColumn, null, null, null)], !);
+    Empty_N = [hex(NewRow, NewColumn, null, null, 0)], !);
     Empty_N = []),
     get_empty_neighbours_aux(hex(Row, Column, _, _, _), DirR, DirC, Empty_Neighbours),
     append(Empty_N, Empty_Neighbours, EmptyNeighbours).
@@ -76,12 +102,12 @@ get_possible_neighbours([X|EmptyNeighbours], Color, PossibleNeighbours) :-
 
 
 %get_vecinos_finales
-get_possible_moves([], []).
-get_possible_moves([X|SameColorHexs], PossibleMoves) :- 
+get_free_positions([], []).
+get_free_positions([X|SameColorHexs], PossibleMoves) :- 
     get_empty_neighbours(X, EmptyNeighbours),
     get_hex_color(X, Color),
     get_possible_neighbours(EmptyNeighbours, Color, PossibleNeighbours),
-    get_possible_moves(SameColorHexs, OldPossibleMoves),
+    get_free_positions(SameColorHexs, OldPossibleMoves),
     append(PossibleNeighbours, OldPossibleMoves, UnsortedPossibleMoves),
     sort(UnsortedPossibleMoves, PossibleMoves).
 
@@ -102,6 +128,25 @@ dfs_aux([H|T],Visited, Result) :-
     get_neighbours(H, Neighbours),
     append(Neighbours,T, ToVisit),
     dfs_aux(ToVisit,[H|Visited], Result).
+
+
+
+
+% USELESS BUGS 
+
+new_useless_hex(uselessHex(Row, Column, Bug, Color, Level)) :- assertz(uselessHex(Row, Column, Bug, Color, Level)).
+
+remove_useless_hex(uselessHex(Row, Column, Bug, Color, Level)) :- retract(uselessHex(Row, Column, Bug, Color, Level)).
+
+get_useless_hex_row(uselessHex(Row, _, _, _, _), Row).
+
+get_useless_hex_column(uselessHex(_, Column, _, _, _), Column).
+
+get_useless_hex_level(uselessHex(_, _, _, _, Level), Level).
+
+get_useless_hex(uselessHex(Row, Column, Bug, Color, Level), uselessHex(Row, Column, Bug, Color, Level)) :- uselessHex(Row, Column, Bug, Color, Level).
+
+get_all_useless_hexs(UselessHexs) :- findall(Hex, get_useless_hex(_, Hex), UselessHexs).
 
 
 
