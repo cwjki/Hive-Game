@@ -6,7 +6,9 @@
                     get_empty_neighbours/2, get_useless_hex/2,
                     get_neighbours/2,
                     get_hex_bug/2,
-                    dfs/2]).
+                    dfs/2,
+                    get_first_empty/5,
+                    get_possible_hex_by_direction/2]).
 
 :- dynamic hex/5.
 :- dynamic uselessHex/5.
@@ -110,6 +112,37 @@ get_free_positions([X|SameColorHexs], PossibleMoves) :-
     get_free_positions(SameColorHexs, OldPossibleMoves),
     append(PossibleNeighbours, OldPossibleMoves, UnsortedPossibleMoves),
     sort(UnsortedPossibleMoves, PossibleMoves).
+
+% buscar el primero vacio en una direccion en linea recta (Grasshopper)
+get_first_empty(OriginHex, X,Y, Accumulated, Hex) :-
+    get_hex(OriginHex, hex(Row, Column, _, _, _)),
+    NewRow is Row + X,
+    NewColumn is Column + Y,
+    ((get_hex(hex(NewRow, NewColumn, _, _, _), NewOrigin), get_first_empty(NewOrigin, X,Y, Accumulated, Hex));
+    (H = [hex(NewRow, NewColumn, null, null, 0)], append(H, Accumulated, Hex))).
+    
+% devuelve todas las casillas donde el Grasshopper puede aterrizar.
+get_possible_hex_by_direction(OriginHex, PossibleHD) :- 
+    get_hex_row(OriginHex, Row), get_hex_column(OriginHex, Column),
+    Hex0 = [],
+    Row1 is Row - 1, Column1 is Column + 1,
+    ((get_hex(hex(Row1, Column1, _, _, _), _), 
+    get_first_empty(OriginHex, -1,1, Hex0, Hex1));  Hex1 = Hex0),
+    Row2 is Row + 1, Column2 is Column + 1,
+    ((get_hex(hex(Row2, Column2, _, _, _), _), 
+    get_first_empty(OriginHex, 1,1, Hex1, Hex2));  Hex2 = Hex1),
+    Row3 is Row + 2,
+    ((get_hex(hex(Row3, Column, _, _, _), _), 
+    get_first_empty(OriginHex, 2,0, Hex2, Hex3));  Hex3 = Hex2),
+    Row4 is Row + 1, Column4 is Column - 1,
+    ((get_hex(hex(Row4, Column4, _, _, _), _), 
+    get_first_empty(OriginHex, 1, -1, Hex3, Hex4));  Hex4 = Hex3),
+    Row5 is Row - 1, Column5 is Column - 1,
+    ((get_hex(hex(Row5, Column5, _, _, _), _), 
+    get_first_empty(OriginHex, -1, -1, Hex4, Hex5));  Hex5 = Hex4),
+    Row6 is Row - 2,
+    ((get_hex(hex(Row6, Column, _, _, _), _), 
+    get_first_empty(OriginHex, -2, 0, Hex5, PossibleHD));  PossibleHD = Hex5).
 
 
 %% Dfs starting from a root

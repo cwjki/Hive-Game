@@ -24,9 +24,6 @@ keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :-
     append(Y,PossibleHexs,NewPossibleHexs).   
 
 
-%si la quito y se desconecta la colmena, solo seran solucion los vecinos que cumplan q se vuelve
-%a unir a colmena poniendola ahi
-%sino seran todos los vecinos
 move_a_queen(OriginHex, PossibleHexs) :- 
     get_empty_neighbours(OriginHex, Neighbours),
     remove_hex(OriginHex),
@@ -35,7 +32,6 @@ move_a_queen(OriginHex, PossibleHexs) :-
     new_hex(OriginHex).
     
 
-%arreglar que solo se revisa si mantiene unida la colmena las casillas vacias
 move_a_scarab(OriginHex, PossibleHexs) :- 
     get_empty_neighbours(OriginHex, EmptyNeighbours),
     get_neighbours(OriginHex, Neighbours),
@@ -46,39 +42,15 @@ move_a_scarab(OriginHex, PossibleHexs) :-
     new_hex(OriginHex).
 
 
+move_a_grasshopper(OriginHex, PossibleHexs) :- 
+    get_possible_hex_by_direction(OriginHex, PossibleHD),
+    remove_hex(OriginHex),
+    get_all_hexs(Hexs),
+    keep_all_together(Hexs, PossibleHD, PossibleHexs),
+    new_hex(OriginHex).
 
 
-% get_first_empty(OriginHex, X,Y, Cumuled, Hex) :-
-%     get_hex(OriginHex, hex(Row, Column,_,_)),
-%     NewRow is Row + X,
-%     NewColumn is Column + Y,
-%     ((get_hex(hex(NewRow, NewColumn,_,_), NewOrigin), get_first_empty(NewOrigin, X,Y, Cumuled, Hex));
-%     (H = [hex(NewRow, NewColumn, null, null)], append(H, Cumuled, Hex))).
-    
-
-
-
-% get_possible_hex_by_direction(OriginHex, PossibleHD) :- get_first_empty(OriginHex, -1,1, [], Hex1),
-%                                                         get_first_empty(OriginHex, 1,1, Hex1, Hex2),
-%                                                         get_first_empty(OriginHex, 2,0, Hex2, Hex3),
-%                                                         get_first_empty(OriginHex, 1,-1, Hex3, Hex4),
-%                                                         get_first_empty(OriginHex, -1,-1, Hex4, Hex5),
-%                                                         get_first_empty(OriginHex, -2,0, Hex5, PossibleHD).
-
-
-
-
-                                          
-% %revisa en las 6 direcciones las casillas disponibles.
-% %si quitar al saltamontes desconecta solo seran validas aquellas casillas que vuelven a conectar la colmena
-% move_a_grasshopper(OriginHex, PossibleHexs) :- get_possible_hex_by_direction(OriginHex, PossibleHD),
-%                                                remove_hex(OriginHex),
-%                                                get_all_hexs(Hexs),
-%                                                ((dfs(Hexs), PossibleHexs = PossibleHD);
-%                                                 keep_all_together(Hexs, PossibleHD, PossibleHexs)),
-%                                                 new_hex(OriginHex).
-
-% Livi, [12/8/2021 7:24 PM]
+                                        
 % %devuelve de la entrada, los que tienen vecinos ocupados (NO DEVUELVE LOS VECINOS OCUPADOS)
 % multiple_get_neighbours([], []).
 % multiple_get_neighbours([X|EmptyNeighbours], Neighbours) :-
@@ -127,11 +99,11 @@ move_a_scarab(OriginHex, PossibleHexs) :-
 get_moves(OriginHex, PossibleDestinies) :- 
     get_hex_bug(OriginHex, Bug),
     (Bug =:= 1 -> move_a_queen(OriginHex, PossibleDestinies);
-    %  Bug =:= 2 -> move_an_ant(OriginHex, PossibleHexs);
-    %  Bug =:= 3 -> move_a_grasshopper(OriginHex, PossibleHexs);
-     Bug =:= 4 -> move_a_scarab(OriginHex, PossibleDestinies); writeln("ALGO SALIO MAL")   
-    %  Bug =:= 5 -> move_a_spider(OriginHex, PossibleHexs);
-    %  Bug =:= 6 -> move_a_mosquito(OriginHex, PossibleHexs);
-    %  Bug =:= 7 -> move_a_ladybug(OriginHex, PossibleHexs);
-    %  Bug =:= 8 -> move_a_pillbug(OriginHex, PossibleHexs)
+    %  Bug =:= 2 -> move_an_ant(OriginHex, PossibleDestinies);
+    Bug =:= 3 -> move_a_grasshopper(OriginHex, PossibleDestinies);
+    Bug =:= 4 -> move_a_scarab(OriginHex, PossibleDestinies)   
+    %  Bug =:= 5 -> move_a_spider(OriginHex, PossibleDestinies);
+    %  Bug =:= 6 -> move_a_mosquito(OriginHex, PossibleDestinies);
+    %  Bug =:= 7 -> move_a_ladybug(OriginHex, PossibleDestinies);
+    %  Bug =:= 8 -> move_a_pillbug(OriginHex, PossibleDestinies)
     ).
