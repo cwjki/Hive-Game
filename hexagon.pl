@@ -3,7 +3,7 @@
                     get_hex_row/2, get_hex_column/2,
                     get_hex_color/2, get_hex_level/2,
                     get_hexs_by_color/2, get_free_positions/2,
-                    get_empty_neighbours/2,
+                    get_empty_neighbours/2, get_useless_hex/2,
                     get_neighbours/2,
                     get_hex_bug/2,
                     dfs/2]).
@@ -13,11 +13,11 @@
 
 new_hex(hex(Row, Column, Bug, Color, Level)) :- 
     not(get_hex(hex(Row, Column, _, _, _), Hex)),
-    assertz(hex(Row, Column, Bug, Color, Level)), !.
+    assertz(hex(Row, Column, Bug, Color, 0)), !.
 
 new_hex(hex(Row, Column, Bug, Color, Level)) :- 
     get_hex(hex(Row, Column, OldBug, OldColor, OldLevel), OldHex),
-    new_useless_hex(OldHex),
+    new_useless_hex(uselessHex(Row, Column, OldBug, OldColor, OldLevel)),
     remove_hex(OldHex),
     NewLevel is OldLevel + 1,
     assertz(hex(Row, Column, Bug, Color, NewLevel)).

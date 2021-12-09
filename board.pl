@@ -21,7 +21,9 @@ move_piece(OriginHex, DestinyHex) :-
     remove_hex(OriginHex),
     new_hex(hex(DestinyRow, DestinyColumn, Bug, Color, Level)).
 
-its_the_queen_on_the_table(Color) :- get_hex(hex(_, _, 1, Color, _), _).
+its_the_queen_on_the_table(Color) :- 
+    get_hex(hex(_, _, 1, Color, _), _);
+    get_useless_hex(uselessHex(_, _, 1, Color, _), _).
 
 get_possible_positions(Color, Positions) :- 
     get_hexs_by_color(Color, SameColorHexs),

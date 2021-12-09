@@ -17,7 +17,9 @@ keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :-
     get_all_hexs(NewHexs),
     ((only_one_hive(NewHexs), Y = [X]);
     Y = []),
-    remove_hex(X),
+    get_hex_row(X, Row), get_hex_column(X, Column),
+    get_hex(hex(Row, Column, _, _, _), NewX),
+    remove_hex(NewX),
     keep_all_together(Hexs, Neighbours, PossibleHexs),
     append(Y,PossibleHexs,NewPossibleHexs).   
 
