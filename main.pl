@@ -1,4 +1,6 @@
 :- use_module(playerVsPC).
+:- use_module(hexagon).
+
 
 
 beginning_message(Input) :- 

@@ -1,55 +1,58 @@
 :- module(hexagon, [get_hex/2, new_hex/1, remove_hex/1, get_all_hexs/1,
                     get_hex_row/2, get_hex_column/2,
-                    get_hexs_by_color/2, get_possible_moves/2]).
+                    get_hexs_by_color/2, get_possible_moves/2,
+                    dfs/2]).
 
-:- dynamic hex/4.
+:- dynamic hex/5.
 
-new_hex(hex(Row, Column, Bug, Color)) :- assertz(hex(Row, Column, Bug, Color)).
+new_hex(hex(Row, Column, Bug, Color, Level)) :- assertz(hex(Row, Column, Bug, Color, Level)).
 
-remove_hex(hex(Row, Column, Bug, Color)) :- retract(hex(Row, Column, Bug, Color)).
+remove_hex(hex(Row, Column, Bug, Color, Level)) :- retract(hex(Row, Column, Bug, Color, Level)).
 
-get_hex_row(hex(Row, _, _, _), Row).
+get_hex_row(hex(Row, _, _, _, _), Row).
 
-get_hex_column(hex(_, Column, _, _), Column).
+get_hex_column(hex(_, Column, _, _, _), Column).
 
-get_hex_bug(hex(_, _, Bug, _), Bug).
+get_hex_bug(hex(_, _, Bug, _, _), Bug).
 
-get_hex_color(hex(_, _, _, Color), Color).
+get_hex_color(hex(_, _, _, Color, _), Color).
 
-get_hex(hex(Row, Column, Bug, Color), hex(Row, Column, Bug, Color)) :- hex(Row, Column, Bug, Color).
+get_hex_level(hex(_, _, _, _, Level), Level).
+
+get_hex(hex(Row, Column, Bug, Color, Level), hex(Row, Column, Bug, Color, Level)) :- hex(Row, Column, Bug, Color, Level).
 
 get_all_hexs(Hexs) :- findall(Hex, get_hex(_, Hex), Hexs).
 
-get_hexs_by_color(Color, Hexs) :- findall(Hex, get_hex(hex(_, _, _, Color), Hex), Hexs).
+get_hexs_by_color(Color, Hexs) :- findall(Hex, get_hex(hex(_, _, _, Color, _), Hex), Hexs).
 
 
 %get_vecinos
-get_neighbours(hex(Row,Column, _,_), Neighbours) :- 
-    get_neighbours_aux(hex(Row,Column, _, _), [-1,1,2,1,-1,-2], [1,1,0,-1,-1,0], Neighbours).
+get_neighbours(hex(Row, Column, Bug, Color, Level), Neighbours) :- 
+    get_neighbours_aux(hex(Row, Column, Bug, Color, Level), [-1,1,2,1,-1,-2], [1,1,0,-1,-1,0], Neighbours).
 
 %get_vecinos_aux
 get_neighbours_aux(_,[],[],[]).
-get_neighbours_aux(hex(Row, Column, _, _), [X|DirR], [Y|DirC], Neighbours) :- 
+get_neighbours_aux(hex(Row, Column, Bug, Color, Level), [X|DirR], [Y|DirC], Neighbours) :- 
     NewRow is Row + X,
     NewColumn is Column + Y,
-    ((get_hex(hex(NewRow, NewColumn, _, _), N), !, N_N = [N]);
+    ((get_hex(hex(NewRow, NewColumn, B, C, L), N), !, N_N = [N]);
     (N_N = [])),
-    get_neighbours_aux(hex(Row, Column, _, _), DirR, DirC, Old_Neighbours),
+    get_neighbours_aux(hex(Row, Column, Bug, Color, Level), DirR, DirC, Old_Neighbours),
     append(N_N,Old_Neighbours, Neighbours).
 
 %get_vecinos_vacios
-get_empty_neighbours(hex(Row,Column,_,_), EmptyNeighbours) :- 
-    get_empty_neighbours_aux(hex(Row,Column,_,_), [-1,1,2,1,-1,-2],[1,1,0,-1,-1,0], EmptyNeighbours).
+get_empty_neighbours(hex(Row, Column, _, _, _), EmptyNeighbours) :- 
+    get_empty_neighbours_aux(hex(Row, Column, _, _, _), [-1,1,2,1,-1,-2],[1,1,0,-1,-1,0], EmptyNeighbours).
 
 %get_vecinos_vacios_aux
 get_empty_neighbours_aux(_, [], [], []).
-get_empty_neighbours_aux(hex(Row,Column,_,_), [X|DirR], [Y|DirC], EmptyNeighbours) :- 
+get_empty_neighbours_aux(hex(Row, Column, _, _, _), [X|DirR], [Y|DirC], EmptyNeighbours) :- 
     NewRow is Row + X,
     NewColumn is Column + Y,
-    ((not(get_hex(hex(NewRow, NewColumn, _, _),_)),
-    Empty_N = [hex(NewRow, NewColumn, null, null)], !);
+    ((not(get_hex(hex(NewRow, NewColumn, _, _, _),_)),
+    Empty_N = [hex(NewRow, NewColumn, null, null, null)], !);
     Empty_N = []),
-    get_empty_neighbours_aux(hex(Row, Column, _, _), DirR, DirC, Empty_Neighbours),
+    get_empty_neighbours_aux(hex(Row, Column, _, _, _), DirR, DirC, Empty_Neighbours),
     append(Empty_N, Empty_Neighbours, EmptyNeighbours).
 
 
@@ -81,7 +84,24 @@ get_possible_moves([X|SameColorHexs], PossibleMoves) :-
     get_possible_moves(SameColorHexs, OldPossibleMoves),
     append(PossibleNeighbours, OldPossibleMoves, UnsortedPossibleMoves),
     sort(UnsortedPossibleMoves, PossibleMoves).
-                                                              
+
+
+%% Dfs starting from a root
+dfs(Hex, Result) :-
+    dfs_aux([Hex], [], Result).
+%% dfs(ToVisit, Visited)
+%% Done, all visited
+dfs_aux([], Visited, Visited) :- !.
+%% Skip elements that are already visited
+dfs_aux([H|T],Visited, Result) :-
+    member(H,Visited),
+    dfs_aux(T,Visited, Result).
+%% Add all neigbors of the head to the toVisit
+dfs_aux([H|T],Visited, Result) :-
+    not(member(H,Visited)),
+    get_neighbours(H, Neighbours),
+    append(Neighbours,T, ToVisit),
+    dfs_aux(ToVisit,[H|Visited], Result).
 
 
 
@@ -100,3 +120,5 @@ get_possible_moves([X|SameColorHexs], PossibleMoves) :-
 %                                  get_neighbour6(Hex, Neighbour).
 
 % get_all_neighbours(Hex, Neighbours) :- findall(Neighbour, get_neighbour(Hex, Neighbour), Neighbours).
+
+

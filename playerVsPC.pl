@@ -15,7 +15,6 @@ init() :-
 
 
 printInfo(Name, Color) :- 
-    writeln(""),
     get_turn(Turn),
     write("Turno # "), write(Turn),
     write(" Le corresponde jugar a: "),
@@ -66,18 +65,15 @@ player_choose_position(Color, ChoosenHex) :-
     read(Option),
     reverse(Positions, X, []),
     nth1(Option, X, ChoosenHex),
-    writeln(ChoosenHex).
-                                       
-
-                
+    writeln("").
+                                                    
 player_play_new_piece() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, Piece, Color)),
-    writeln("Simular que se puso uno ficha.").
+    add_new_piece(hex(Row, Column, Piece, Color, 0)).
+    
 
 player_move_one_piece() :- writeln("Simular mover una ficha").
-
 
 
 print_neighbours_options(Option) :- 
@@ -103,11 +99,11 @@ player_choose_position_second_play(Row, Column) :-
 
 player_first_play() :- 
     get_color(Color), player_choose_hand_piece(Piece),
-    add_new_piece(hex(0, 0, Piece, Color)).
+    add_new_piece(hex(0, 0, Piece, Color, 0)).
 
 player_second_play() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position_second_play(Row, Column),
-    add_new_piece(hex(Row, Column, Piece, Color)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)).
 
 
 
@@ -139,19 +135,19 @@ pc_choose_position_second_play(Row, Column) :-
 
 pc_first_play() :- 
     get_color(Color), pc_choose_hand_piece(Piece),
-    add_new_piece(hex(0, 0, Piece, Color)).
+    add_new_piece(hex(0, 0, Piece, Color, 0)).
 
 pc_second_play() :- 
     get_color(Color), pc_choose_hand_piece(Piece), pc_choose_position_second_play(Row, Column),
-    add_new_piece(hex(Row, Column, Piece, Color)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)).
 
 
 player_next_move() :- 
     get_turn(Turn), get_color(Color),
-     % primera jugada del jugador, en el turno 1 o en el turno 2, depende de si es blancas o negras.
+    % primera jugada del jugador, en el turno 1 o en el turno 2, depende de si es blancas o negras.
     (Turn =:= 1 -> player_first_play();
     Turn =:= 2 -> player_second_play();
-     % forzar a poner la reina abeja si no ha sido colocada antes del turno 4.
+    % forzar a poner la reina abeja si no ha sido colocada antes del turno 4.
     (Color =:= 0, Turn =:= 7, not(its_the_queen_on_the_table(0)) -> force_queenBee(Color));
     (Color =:= 1, Turn =:= 8, not(its_the_queen_on_the_table(1)) -> force_queenBee(Color));
     % si esta puesta la reina mostras las opciones de juego.
@@ -171,13 +167,14 @@ force_queenBee(Color) :-
 pc_force_queenBee(Color) :- 
     pc_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, 1, Color)).
+    add_new_piece(hex(Row, Column, 1, Color, 0)).
 
 
 player_force_queenBee(Color) :- 
+    writeln("Debe colocar la reina abeja en este turno obligatoriamente."),
     player_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, 1, Color)).
+    add_new_piece(hex(Row, Column, 1, Color, 0)).
 
 
 pc_choose_position(Color, ChoosenHex) :- 
@@ -191,7 +188,7 @@ pc_choose_position(Color, ChoosenHex) :-
 pc_play_new_piece():- 
     get_color(Color), pc_choose_hand_piece(Piece), pc_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, Piece, Color)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)).
 
 
 pc_move_one_piece() :- writeln("Simular PC movio ficha").             
@@ -199,16 +196,16 @@ pc_move_one_piece() :- writeln("Simular PC movio ficha").
 pc_next_move() :- 
     get_turn(Turn), get_color(Color),
     (Turn =:= 1 -> pc_first_play();
-     Turn =:= 2 -> pc_second_play();
-     % forzar a poner la reina abeja si no ha sido colocada antes del turno 4.
-     (Color =:= 0, Turn =:= 7, not(its_the_queen_on_the_table(0)) -> force_queenBee(Color));
-     (Color =:= 1, Turn =:= 8, not(its_the_queen_on_the_table(1)) -> force_queenBee(Color));
-      % si esta puesta la reina generar una de las jugadas aleatorias.
-     (Turn >=  2, its_the_queen_on_the_table(Color)) -> (random(1,2, R),
-     (R =:= 1 -> pc_play_new_piece();
-      R =:= 2 -> pc_move_one_piece()));
-      % solo poner nuevas fichas si no se ha puesto la reina.
-      pc_play_new_piece()
+    Turn =:= 2 -> pc_second_play();
+    % forzar a poner la reina abeja si no ha sido colocada antes del turno 4.
+    (Color =:= 0, Turn =:= 7, not(its_the_queen_on_the_table(0)) -> force_queenBee(Color));
+    (Color =:= 1, Turn =:= 8, not(its_the_queen_on_the_table(1)) -> force_queenBee(Color));
+    % si esta puesta la reina generar una de las jugadas aleatorias.
+    (Turn >=  2, its_the_queen_on_the_table(Color)) -> (random(1,2, R),
+    (R =:= 1 -> pc_play_new_piece();
+    R =:= 2 -> pc_move_one_piece()));
+    % solo poner nuevas fichas si no se ha puesto la reina.
+    pc_play_new_piece()
     ).
                
 
@@ -220,14 +217,20 @@ next_move(Name) :-
 play(Color, Turn) :- 
     get_player(player(Name, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
     printInfo(Name, Color),
+    write("Tablero antes de jugar"),
     print_board(_), 
     next_move(Name),
-    print_board(_),
+    write("Tablero despues de jugar"),
+    print_board(_),         
     update_turn(NewTurn),
     update_color(NewColor),               
     play(NewColor, NewTurn).
 
 playerVsPC() :- init(), play(0, 1).
 
-print_board(Board) :- get_board(Board), writeln(Board). 
+print_board(Board) :- 
+    get_board(Board),
+    writeln(""), 
+    writeln(Board),
+    writeln(""). 
 
