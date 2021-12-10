@@ -65,7 +65,8 @@ get_moves(OriginHex, PossibleDestinies) :-
     Bug =:= 2 -> move_an_ant(OriginHex, PossibleDestinies);
     Bug =:= 3 -> move_a_grasshopper(OriginHex, PossibleDestinies);
     Bug =:= 4 -> move_a_scarab(OriginHex, PossibleDestinies);   
-    Bug =:= 5 -> move_a_spider(OriginHex, PossibleDestinies)
+    Bug =:= 5 -> move_a_spider(OriginHex, PossibleDestinies);
+    PossibleDestinies = []
     %  Bug =:= 6 -> move_a_mosquito(OriginHex, PossibleDestinies);
     %  Bug =:= 7 -> move_a_ladybug(OriginHex, PossibleDestinies);
     %  Bug =:= 8 -> move_a_pillbug(OriginHex, PossibleDestinies)

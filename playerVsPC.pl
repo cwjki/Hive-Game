@@ -300,10 +300,10 @@ play(Color, Turn) :-
     get_player(player(Name, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
     printInfo(Name, Color),
     write("Tablero antes de jugar"),
-    print_board(_), 
+    print_board(), 
     next_move(Name),
     write("Tablero despues de jugar"),
-    print_board(_),         
+    print_board(),         
     update_turn(NewTurn),
     update_color(NewColor),
     check_win_condition(NewTurn, Condition),
@@ -312,7 +312,7 @@ play(Color, Turn) :-
 
 playerVsPC() :- init(), play(0, 1).
 
-print_board(Board) :- 
+print_board() :- 
     get_board(Board),
     writeln(""), 
     writeln(Board),
