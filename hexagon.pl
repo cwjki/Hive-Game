@@ -4,6 +4,12 @@
                     get_hex_color/2, get_hex_level/2,
                     get_hexs_by_color/2, get_free_positions/2,
                     get_empty_neighbours/2, get_useless_hex/2,
+                    only_one_hive/1,
+                    reachable_path/2,
+                    keep_all_together/3,
+                    get_hive_empty_neighbours/2,
+                    get_multiple_empty_neighbours/2,
+                    distance/3,
                     get_neighbours/2,
                     get_hex_bug/2,
                     dfs/2,
@@ -161,6 +167,79 @@ dfs_aux([H|T],Visited, Result) :-
     get_neighbours(H, Neighbours),
     append(Neighbours,T, ToVisit),
     dfs_aux(ToVisit,[H|Visited], Result).
+
+
+
+
+only_one_hive([H|Hexs]) :- 
+    dfs(H, Reachable),
+    length(Reachable, RLength),
+    length(Hexs, Length), HLength is Length + 1,
+    RLength =:= HLength.
+
+
+keep_all_together(_, [], []).
+keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :- 
+    new_hex(X),
+    get_all_hexs(NewHexs),
+    ((only_one_hive(NewHexs), Y = [X]);
+    Y = []),
+    get_hex_row(X, Row), get_hex_column(X, Column),
+    get_hex(hex(Row, Column, _, _, _), NewX),
+    remove_hex(NewX),
+    keep_all_together(Hexs, Neighbours, PossibleHexs),
+    append(Y,PossibleHexs,NewPossibleHexs). 
+
+
+
+
+%devuelve los vecinos vacios de la entrada
+get_multiple_empty_neighbours([], []).
+get_multiple_empty_neighbours([X|PossibleStep], EmptyNeighbours) :-
+    get_empty_neighbours(X, SingleEmptyNeighbours),
+    get_multiple_empty_neighbours(PossibleStep, OldEmptyNeighbours),
+    findall(M, (member(M, SingleEmptyNeighbours), not(member(M, PossibleStep)), M \== X), Result),
+    append(Result, OldEmptyNeighbours, EmptyNeighbours).
+
+%devuelve de la entrada, los que tienen vecinos ocupados (NO DEVUELVE LOS VECINOS OCUPADOS)
+get_hive_empty_neighbours([], []).
+get_hive_empty_neighbours([X|EmptyNeighbours], Neighbours) :-
+    get_neighbours(X, SingleNeighbours),
+    get_hive_empty_neighbours(EmptyNeighbours, OldNeighbours),
+    ((length(SingleNeighbours, Length), Length =\= 0, Y = [X]); Y = []),
+    append(Y, OldNeighbours, Neighbours).
+
+
+reachable_path(Hex, Result) :-
+    reachable_path_aux([Hex], [], Result).
+
+reachable_path_aux([], Visited, Visited) :- !.
+reachable_path_aux([H|T], Visited, Result) :-
+    member(H, Visited),
+    reachable_path_aux(T, Visited, Result).
+reachable_path_aux([H|T], Visited, Result) :-
+    not(member(H, Visited)),
+    get_empty_neighbours(H, EmptyNeighbours),
+    get_hive_empty_neighbours(EmptyNeighbours, ValidHexs),
+    append(ValidHexs, T, ToVisit),
+    reachable_path_aux(ToVisit, [H|Visited], Result).
+
+% función doubleheight_distance (a, b):
+%     var dcol = abs (a.col - b.col)
+%     var drow = abs (a.row - b.row)
+%     return dcol + max (0, (drow − dcol) / 2)
+
+distance(OriginHex, DestinyHex, Distance) :-
+    get_hex_row(OriginHex, ORow), get_hex_column(OriginHex, OColumn),
+    get_hex_row(DestinyHex, DRow), get_hex_column(DestinyHex, DColumn),
+    RDistance is abs(ORow - DRow),
+    CDistance is abs(OColumn - DColumn),
+    AuxDistance1 is (RDistance - CDistance) // 2,
+    AuxDistance2 is max(0, AuxDistance1),
+    Distance is CDistance + AuxDistance2,
+    writeln("DISTANCIA"), writeln(Distance),writeln("DISTANCIA").
+
+
 
 
 
