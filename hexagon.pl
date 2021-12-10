@@ -12,6 +12,7 @@
                     distance/3,
                     get_neighbours/2,
                     get_hex_bug/2,
+                    check_queen/1,
                     dfs/2,
                     get_first_empty/5,
                     get_possible_hex_by_direction/2]).
@@ -224,25 +225,6 @@ reachable_path_aux([H|T], Visited, Result) :-
     append(ValidHexs, T, ToVisit),
     reachable_path_aux(ToVisit, [H|Visited], Result).
 
-% función doubleheight_distance (a, b):
-%     var dcol = abs (a.col - b.col)
-%     var drow = abs (a.row - b.row)
-%     return dcol + max (0, (drow − dcol) / 2)
-
-distance(OriginHex, DestinyHex, Distance) :-
-    get_hex_row(OriginHex, ORow), get_hex_column(OriginHex, OColumn),
-    get_hex_row(DestinyHex, DRow), get_hex_column(DestinyHex, DColumn),
-    RDistance is abs(ORow - DRow),
-    CDistance is abs(OColumn - DColumn),
-    AuxDistance1 is (RDistance - CDistance) // 2,
-    AuxDistance2 is max(0, AuxDistance1),
-    Distance is CDistance + AuxDistance2,
-    writeln("DISTANCIA"), writeln(Distance),writeln("DISTANCIA").
-
-
-
-
-
 
 % USELESS BUGS 
 
@@ -261,21 +243,8 @@ get_useless_hex(uselessHex(Row, Column, Bug, Color, Level), uselessHex(Row, Colu
 get_all_useless_hexs(UselessHexs) :- findall(Hex, get_useless_hex(_, Hex), UselessHexs).
 
 
-
-% get_neighbour1(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row - 1, NeighbourColumn is Column + 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
-% get_neighbour2(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 1, NeighbourColumn is Column + 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
-% get_neighbour3(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 2, Neighbour = hex(NeighbourRow, Column, _, _).
-% get_neighbour4(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row + 1, NeighbourColumn is Column - 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
-% get_neighbour5(hex(Row, Column, _, _), Neighbour) :- NeighbourRow is Row - 1, NeighbourColumn is Column - 1, Neighbour = hex(NeighbourRow, NeighbourColumn, _, _).
-% get_neighbour6(hex(Row, Column, _, _), Neighbour) :- NeighbourColumn is Column + 2, Neighbour = hex(Row, NeighbourColumn, _, _).
-
-% get_neighbour(Hex, Neighbour) :- get_neighbour1(Hex, Neighbour);                                                     
-%                                  get_neighbour2(Hex, Neighbour);
-%                                  get_neighbour3(Hex, Neighbour);
-%                                  get_neighbour4(Hex, Neighbour);
-%                                  get_neighbour5(Hex, Neighbour);
-%                                  get_neighbour6(Hex, Neighbour).
-
-% get_all_neighbours(Hex, Neighbours) :- findall(Neighbour, get_neighbour(Hex, Neighbour), Neighbours).
-
-
+check_queen(Color) :-
+    its_the_queen_on_the_table(Color),
+    get_hex(hex(_, _, 1, Color, _), Queen),
+    get_empty_neighbours(Queen, Neighbours),
+    length(Neighbours, 0).

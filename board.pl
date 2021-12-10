@@ -32,4 +32,11 @@ get_possible_positions(Color, Positions) :-
 get_possible_moves(Hex, Moves) :- 
     get_moves(Hex, Moves).
 
+ 
+check_win_condition(Turn, Condition) :-
+    (Turn > 100, Condition = 2);
+    (check_queen(0), ((check_queen(1), Condition = 2);  Condition = 1));
+    (check_queen(1), Condition = 0);
+    Condition = 3.
 
+    
