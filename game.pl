@@ -35,14 +35,10 @@ check_for_move_a_piece(Color) :-
     length(Pieces, Length),
     Length > 0.
 
-
-
-
 pass_turn() :- 
     get_player(player(Name, _, _, _, _, _, _, _, _, _), _),
     writeln("El jugador "), write(Name), 
     write(" pasa el turno por no tener jugadas posibles").
-
 
 
 force_queenBee(Color) :- 
@@ -54,6 +50,7 @@ force_queenBee(Color) :-
 next_move(Name) :- 
     (Name =:= 0 -> player_next_move();
     pc_next_move()).
+
 
 play(Color, Turn) :- 
     get_player(player(Name, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
@@ -69,9 +66,9 @@ play(Color, Turn) :-
     (Condition =:= 3, play(NewColor, NewTurn)),
     writeln("GRACIAS POR JUGAR").
 
+
 playerVsPC() :- init(1), play(0, 1).
 pcVsPC() :- init(2), play(0, 1).
-
 
 
 %%%% PRINTS %%%%
@@ -117,6 +114,36 @@ print_choose_option(Option) :-
     read(Option),
     writeln("").
 
+print_new_piece(Bug, Row, Column) :-
+    write("Se ha colocado el bicho "),
+    ((Bug =:= 1    -> write("Abeja Reina"));
+    (Bug =:= 2     -> write("Hormiga"));                         
+    (Bug =:= 3     -> write("Saltamonte"));                         
+    (Bug =:= 4     -> write("Escarabajo"));                         
+    (Bug =:= 5     -> write("Arana"));                         
+    (Bug =:= 6     -> write("Mosquito"));                         
+    (Bug =:= 7     -> write("Mariquita")); 
+    (Bug =:= 8     -> write("Bicho Bola"))),
+    write(" en la posicion "), write("["), write(Row), write(", "), write(Column), write("]"),
+    writeln("").
+
+print_move_one_piece(ChoosenPiece, ChoosenDestiny) :-
+    write("Se ha movido el bicho " ),
+    get_hex_bug(ChoosenPiece, Bug),
+    ((Bug =:= 1    -> write("Abeja Reina"));
+    (Bug =:= 2     -> write("Hormiga"));                         
+    (Bug =:= 3     -> write("Saltamonte"));                         
+    (Bug =:= 4     -> write("Escarabajo"));                         
+    (Bug =:= 5     -> write("Arana"));                         
+    (Bug =:= 6     -> write("Mosquito"));                         
+    (Bug =:= 7     -> write("Mariquita")); 
+    (Bug =:= 8     -> write("Bicho Bola"))),
+    get_hex_row(ChoosenPiece, ORow), get_hex_column(ChoosenPiece, OColumn),
+    get_hex_row(ChoosenDestiny, DRow), get_hex_column(ChoosenDestiny, DColumn),
+    write(" de la posicion "), write("["), write(ORow), write(", "), write(OColumn), write("]"),
+    write(" hacia la posicion "), write("["), write(DRow), write(", "), write(DColumn), write("]"),
+    writeln("").
+
 %%%% PRINTS %%%%
 
 %%%% PLAYER LOGIC %%%%
@@ -127,7 +154,7 @@ player_choose_hand_piece(Piece) :-
     (Ants > 0         -> writeln("2 - Hormiga"); true),
     (Grasshoppers > 0 -> writeln("3 - Saltamontes"); true),
     (Scarabs > 0      -> writeln("4 - Escarabajo"); true),
-    (Spiders > 0      -> writeln("5 - Araña"); true),
+    (Spiders > 0      -> writeln("5 - Arana"); true),
     (Mosquitos > 0    -> writeln("6 - Mosquito"); true),
     (Ladybugs > 0     -> writeln("7 - Mariquita"); true),
     (Pillbugs > 0     -> writeln("8 - Bicho Bola"); true),
@@ -156,9 +183,9 @@ player_choose_board_piece(Color, ChoosenHex) :-
 player_play_new_piece() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, Piece, Color, 0)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)),
+    print_new_piece(Piece, Row, Column).
     
-
 player_choose_piece_destiny(OriginHex, DestinyHex) :-
     writeln("Seleccione la casilla destino para su ficha:"),
     get_possible_moves(OriginHex, PossibleDestinies),
@@ -172,7 +199,8 @@ player_move_one_piece() :-
     get_color(Color),
     player_choose_board_piece(Color, OriginHex),
     player_choose_piece_destiny(OriginHex, DestinyHex),
-    move_piece(OriginHex, DestinyHex).
+    move_piece(OriginHex, DestinyHex),
+    print_move_one_piece(OriginHex, DestinyHex).
 
 
 player_choose_position_second_play(Row, Column) :- 
@@ -189,15 +217,20 @@ player_force_queenBee(Color) :-
     writeln("Debe colocar la reina abeja en este turno obligatoriamente."),
     player_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, 1, Color, 0)).
+    add_new_piece(hex(Row, Column, 1, Color, 0)),
+    print_new_piece(1, Row, Column).
+
 
 player_first_play() :- 
     get_color(Color), player_choose_hand_piece(Piece),
-    add_new_piece(hex(0, 0, Piece, Color, 0)).
+    add_new_piece(hex(0, 0, Piece, Color, 0)),
+    print_new_piece(Piece, 0, 0).
 
 player_second_play() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position_second_play(Row, Column),
-    add_new_piece(hex(Row, Column, Piece, Color, 0)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)),
+    print_new_piece(Piece, Row, Column).
+
 
 player_next_move() :- 
     get_turn(Turn), get_color(Color),
@@ -249,16 +282,20 @@ pc_choose_position_second_play(Row, Column) :-
 
 pc_first_play() :- 
     get_color(Color), pc_choose_hand_piece(Piece),
-    add_new_piece(hex(0, 0, Piece, Color, 0)).
+    add_new_piece(hex(0, 0, Piece, Color, 0)),
+    print_new_piece(Piece, 0, 0).
 
 pc_second_play() :- 
     get_color(Color), pc_choose_hand_piece(Piece), pc_choose_position_second_play(Row, Column),
-    add_new_piece(hex(Row, Column, Piece, Color, 0)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)),
+    print_new_piece(Piece, Row, Column).
 
 pc_force_queenBee(Color) :- 
     pc_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, 1, Color, 0)).
+    add_new_piece(hex(Row, Column, 1, Color, 0)),
+    print_new_piece(1, Row, Column).
+
 
 pc_choose_position(Color, ChoosenHex) :- 
     get_possible_positions(Color, Positions),
@@ -269,7 +306,8 @@ pc_choose_position(Color, ChoosenHex) :-
 pc_play_new_piece():- 
     get_color(Color), pc_choose_hand_piece(Piece), pc_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
-    add_new_piece(hex(Row, Column, Piece, Color, 0)).
+    add_new_piece(hex(Row, Column, Piece, Color, 0)),
+    print_new_piece(Piece, Row, Column).
 
 pc_choose_board_piece(Color, ChoosenPiece) :-
     get_hexs_by_color(Color, Hexs),
@@ -290,8 +328,7 @@ pc_move_one_piece() :-
     pc_choose_piece_destiny(ChoosenPiece, ChoosenDestiny),
     move_piece(ChoosenPiece, ChoosenDestiny),
     get_player(player(Name, Color, _, _, _, _, _, _, _, _), Current_Player),
-    writeln("El jugador "), write(Name), write("movio la pieza "), write(ChoosenPiece),
-    write("para "), write(ChoosenDestiny), writeln("").
+    print_move_one_piece(ChoosenPiece, ChoosenDestiny).
 
 pc_next_move() :- 
     get_turn(Turn), get_color(Color),

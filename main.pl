@@ -3,11 +3,11 @@
 
 beginning_message(Input) :- 
     writeln(""),
-    writeln("Proyecto I Programación Declarativa - Olivia González Peña, Juan Carlos Casteleiro Wong - C411"),
+    writeln("Proyecto I Programacion Declarativa - Olivia Gonzalez Pena, Juan Carlos Casteleiro Wong - C411"),
     writeln("HIVE"),
     writeln("Opciones de Juego:"),
     writeln("1 - Jugador contra PC"),
-    writeln("2 - Simulación de dos jugadores"),
+    writeln("2 - Simulacion de dos jugadores"),
     read(Input),
     writeln("").
 
