@@ -31,7 +31,7 @@ new_hex(hex(Row, Column, Bug, Color, Level)) :-
 new_hex(hex(Row, Column, Bug, Color, Level)) :- 
     get_hex(hex(Row, Column, OldBug, OldColor, OldLevel), OldHex),
     new_useless_hex(uselessHex(Row, Column, OldBug, OldColor, OldLevel)),
-    remove_hex(OldHex),
+    retract(OldHex),
     NewLevel is OldLevel + 1,
     assertz(hex(Row, Column, Bug, Color, NewLevel)).
 

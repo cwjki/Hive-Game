@@ -11,8 +11,10 @@ move_a_queen(OriginHex, PossibleHexs) :-
     new_hex(OriginHex).
     
 
-move_a_scarab(OriginHex, PossibleHexs) :- 
-    get_slidable_neighbours(OriginHex, EmptyNeighbours),
+move_a_scarab(OriginHex, PossibleHexs) :-
+    get_hex_level(OriginHex, Level),
+    ((Level =:= 0, get_slidable_neighbours(OriginHex, EmptyNeighbours));
+    (Level > 0, get_empty_neighbours(OriginHex, EmptyNeighbours))),
     get_neighbours(OriginHex, Neighbours),
     append(EmptyNeighbours, Neighbours, AllNeighbours),
     remove_hex(OriginHex),
@@ -59,9 +61,6 @@ move_a_ladybug(OriginHex, PossibleHexs) :-
     keep_all_together(Hexs, PossibleThirdStep, OldPossibleHexs),
     sort(OldPossibleHexs, PossibleHexs),
     new_hex(OriginHex).
-
-
-
 
 move_an_ant(OriginHex, PossibleHexs) :-
     remove_hex(OriginHex),
