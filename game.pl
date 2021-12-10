@@ -1,4 +1,5 @@
-:- module(playerVsPC, [playerVsPC/0]).
+:- module(game, [playerVsPC/0,
+                        pcVsPC/0]).
 
 :- use_module(player).
 :- use_module(utils).
@@ -6,8 +7,10 @@
 :- use_module(hexagon).
 
 
-init() :- 
-    random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)),
+init(Option) :-
+    ((Option =:= 1, random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)));
+     (Option =:= 2, random(0, 2, R1), new_player(player(1, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)))
+    ),
     init_color(),
     init_turn(),
     writeln("Comienza la partida, el color de las fichas fue asignado aleatoriamente."),
@@ -122,15 +125,7 @@ player_move_one_piece() :-
 
 
 
-print_neighbours_options(Option) :- 
-    writeln("Seleccione en que coordenadas desea colocar la ficha:"),
-    writeln("1 - [-1, 1]"),
-    writeln("2 - [1, 1]"),
-    writeln("3 - [2, 0]"),
-    writeln("4 - [1, -1]"),
-    writeln("5 - [-1, -1]"),
-    writeln("6 - [-2, 0]"),
-    read(Option).
+
 
 player_choose_position_second_play(Row, Column) :- 
     print_neighbours_options(Option),
@@ -310,13 +305,35 @@ play(Color, Turn) :-
     (Condition =:= 3, play(NewColor, NewTurn)),
     writeln("GRACIAS POR JUGAR").
 
-playerVsPC() :- init(), play(0, 1).
+playerVsPC() :- init(1), play(0, 1).
+pcVsPC() :- init(2), play(0, 1).
 
-pcVsPC() :- init(), play(0, 1).
+
+
+
+
+%%%% PRINTS %%%%
 
 print_board() :- 
     get_board(Board),
     writeln(""), 
     writeln(Board),
     writeln(""). 
+
+
+print_neighbours_options(Option) :- 
+    writeln("Seleccione en que coordenadas desea colocar la ficha:"),
+    writeln("1 - [-1, 1]"),
+    writeln("2 - [1, 1]"),
+    writeln("3 - [2, 0]"),
+    writeln("4 - [1, -1]"),
+    writeln("5 - [-1, -1]"),
+    writeln("6 - [-2, 0]"),
+    read(Option).
+
+
+
+%%%% PLAYER LOGIC %%%%
+
+%%%% PC LOGIC %%%%
 

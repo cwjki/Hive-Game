@@ -15,7 +15,7 @@ beginning_message(Input) :-
 main() :- 
     beginning_message(Input), 
     (Input =:= 1 -> playerVsPC(), main();
-    (Input =:= 2 -> playerVsPlayer(), main());
+    (Input =:= 2 -> pcVsPC(), main());
     (writeln("Debe seleccionar una de las opciones disponibles"), main())).
 
 
