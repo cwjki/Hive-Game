@@ -251,8 +251,10 @@ play(Color, Turn) :-
     write("Tablero despues de jugar"),
     print_board(_),         
     update_turn(NewTurn),
-    update_color(NewColor),               
-    play(NewColor, NewTurn).
+    update_color(NewColor),
+    check_win_condition(NewTurn, Condition),
+    (Condition =:= 3, play(NewColor, NewTurn)),
+    writeln("GRACIAS POR JUGAR").
 
 playerVsPC() :- init(), play(0, 1).
 

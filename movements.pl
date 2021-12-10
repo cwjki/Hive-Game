@@ -4,7 +4,7 @@
 
 
 move_a_queen(OriginHex, PossibleHexs) :- 
-    get_empty_neighbours(OriginHex, Neighbours),
+    get_slidable_neighbours(OriginHex, Neighbours),
     remove_hex(OriginHex),
     get_all_hexs(Hexs),
     keep_all_together(Hexs, Neighbours, PossibleHexs),
@@ -12,7 +12,7 @@ move_a_queen(OriginHex, PossibleHexs) :-
     
 
 move_a_scarab(OriginHex, PossibleHexs) :- 
-    get_empty_neighbours(OriginHex, EmptyNeighbours),
+    get_slidable_neighbours(OriginHex, EmptyNeighbours),
     get_neighbours(OriginHex, Neighbours),
     append(EmptyNeighbours, Neighbours, AllNeighbours),
     remove_hex(OriginHex),
@@ -30,7 +30,7 @@ move_a_grasshopper(OriginHex, PossibleHexs) :-
 
 
 move_a_spider(OriginHex, PossibleHexs) :- 
-    get_empty_neighbours(OriginHex, EmptyNeighbours),
+    get_slidable_neighbours(OriginHex, EmptyNeighbours),
     remove_hex(OriginHex),
     get_hive_empty_neighbours(EmptyNeighbours, PossibleFirstStep),
     new_hex(OriginHex),

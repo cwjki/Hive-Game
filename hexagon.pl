@@ -9,13 +9,15 @@
                     keep_all_together/3,
                     get_hive_empty_neighbours/2,
                     get_multiple_empty_neighbours/2,
-                    distance/3,
+                    get_slidable_neighbours/2,
+                    its_slidable/2,
                     get_neighbours/2,
                     get_hex_bug/2,
                     check_queen/1,
                     dfs/2,
                     get_first_empty/5,
-                    get_possible_hex_by_direction/2]).
+                    get_possible_hex_by_direction/2,
+                    its_the_queen_on_the_table/1]).
 
 :- dynamic hex/5.
 :- dynamic uselessHex/5.
@@ -197,7 +199,7 @@ keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :-
 %devuelve los vecinos vacios de la entrada
 get_multiple_empty_neighbours([], []).
 get_multiple_empty_neighbours([X|PossibleStep], EmptyNeighbours) :-
-    get_empty_neighbours(X, SingleEmptyNeighbours),
+    get_slidable_neighbours(X, SingleEmptyNeighbours),
     get_multiple_empty_neighbours(PossibleStep, OldEmptyNeighbours),
     findall(M, (member(M, SingleEmptyNeighbours), not(member(M, PossibleStep)), M \== X), Result),
     append(Result, OldEmptyNeighbours, EmptyNeighbours).
@@ -220,7 +222,7 @@ reachable_path_aux([H|T], Visited, Result) :-
     reachable_path_aux(T, Visited, Result).
 reachable_path_aux([H|T], Visited, Result) :-
     not(member(H, Visited)),
-    get_empty_neighbours(H, EmptyNeighbours),
+    get_slidable_neighbours(H, EmptyNeighbours),
     get_hive_empty_neighbours(EmptyNeighbours, ValidHexs),
     append(ValidHexs, T, ToVisit),
     reachable_path_aux(ToVisit, [H|Visited], Result).
@@ -243,8 +245,25 @@ get_useless_hex(uselessHex(Row, Column, Bug, Color, Level), uselessHex(Row, Colu
 get_all_useless_hexs(UselessHexs) :- findall(Hex, get_useless_hex(_, Hex), UselessHexs).
 
 
+its_the_queen_on_the_table(Color) :- 
+    get_hex(hex(_, _, 1, Color, _), _);
+    get_useless_hex(uselessHex(_, _, 1, Color, _), _).
+
+
 check_queen(Color) :-
     its_the_queen_on_the_table(Color),
     get_hex(hex(_, _, 1, Color, _), Queen),
     get_empty_neighbours(Queen, Neighbours),
     length(Neighbours, 0).
+
+
+its_slidable(OriginHex, DestinyHex) :- 
+    get_neighbours(OriginHex, ONeighbours),
+    get_neighbours(DestinyHex, DNeighbours),
+    findall(H, (member(H, ONeighbours), member(H, DNeighbours)), Result),
+    length(Result, Length),
+    Length < 2.
+
+get_slidable_neighbours(OriginHex, SlidableNeighbours) :-
+    get_empty_neighbours(OriginHex, EmptyNeighbours),
+    findall(H, (member(H, EmptyNeighbours), its_slidable(OriginHex, H)), SlidableNeighbours).
