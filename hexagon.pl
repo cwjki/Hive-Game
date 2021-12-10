@@ -9,7 +9,7 @@
                     keep_all_together/3,
                     get_hive_empty_neighbours/2,
                     get_multiple_empty_neighbours/2,
-                    get_slidable_neighbours/2,
+                    get_slidable_neighbours/2,                 
                     its_slidable/2,
                     get_neighbours/2,
                     get_hex_bug/2,

@@ -70,13 +70,36 @@ player_choose_position(Color, ChoosenHex) :-
 player_choose_board_piece(Color, ChoosenHex) :-
     writeln("Seleccione la ficha que desea mover:"),
     get_hexs_by_color(Color, Hexs),
-    print_positions(Hexs, TotalOptions),
+    get_possible_piece_to_move(Hexs, Pieces),
+    print_positions(Pieces, TotalOptions),
     read(Option),
-    reverse(Hexs, X, []),
+    reverse(Pieces, X, []),
     nth1(Option, X, ChoosenHex),
     writeln("").
 
-                                           
+
+can_play(Color, Possibilities) :-
+    (check_for_play_new_piece(Color), ((check_for_move_a_piece(Color), Possibilities = 3); Possibilities = 1));
+    (check_for_move_a_piece(Color), Possibilities = 2);
+    Possibilities = 0.
+
+
+check_for_play_new_piece(Color) :-
+    writeln("CHECK PLAY"),
+    get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), _),
+    (QueenBee > 0; Ants > 0; Grasshoppers > 0; Scarabs > 0; Spiders > 0;
+    Mosquitos > 0; Ladybugs > 0; Pillbugs > 0),
+    get_possible_positions(Color, Positions).
+
+
+check_for_move_a_piece(Color) :-
+    writeln("CHECK MoVEs"),
+    get_hexs_by_color(Color, Hexs),
+    its_the_queen_on_the_table(Color),
+    get_possible_piece_to_move(Hexs, Pieces),
+    length(Pieces, Length),
+    Length > 0.
+
 player_play_new_piece() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position(Color, ChoosenHex),
     get_hex_row(ChoosenHex, Row), get_hex_column(ChoosenHex, Column),
@@ -98,9 +121,6 @@ player_move_one_piece() :-
     player_choose_board_piece(Color, OriginHex),
     player_choose_piece_destiny(OriginHex, DestinyHex),
     move_piece(OriginHex, DestinyHex).
-
-
-    
 
 
 
@@ -132,7 +152,6 @@ player_first_play() :-
 player_second_play() :- 
     get_color(Color), player_choose_hand_piece(Piece), player_choose_position_second_play(Row, Column),
     add_new_piece(hex(Row, Column, Piece, Color, 0)).
-
 
 
 pc_choose_hand_piece(Piece) :- 
@@ -178,13 +197,23 @@ player_next_move() :-
     % forzar a poner la reina abeja si no ha sido colocada antes del turno 4.
     (Color =:= 0, Turn =:= 7, not(its_the_queen_on_the_table(0)) -> force_queenBee(Color));
     (Color =:= 1, Turn =:= 8, not(its_the_queen_on_the_table(1)) -> force_queenBee(Color));
-    % si esta puesta la reina mostras las opciones de juego.
-    (Turn >=  2, its_the_queen_on_the_table(Color)) -> (choose_option(Option),
-    (Option =:= 1 -> player_play_new_piece();
-    Option =:= 2 -> player_move_one_piece()));
-    % solo poner nuevas fichas si no se ha puesto la reina.
-    player_play_new_piece()
-    ).
+    (can_play(Color, Possibilities),
+    % si esta puesta la reina muestras las opciones de juego.
+    (Turn >=  2, 
+    (Possibilities =:= 3 -> (choose_option(Option),
+        (Option =:= 1 -> player_play_new_piece();
+        Option =:= 2 -> player_move_one_piece()))
+    );
+    (Possibilities =:= 1 -> player_play_new_piece());
+    (Possibilities =:= 2 -> player_move_one_piece());
+    (Possibilities =:= 0 -> pass_turn())    
+    ))).
+
+pass_turn() :- 
+    get_player(player(Name, _, _, _, _, _, _, _, _, _), _),
+    writeln("El jugador "), write(Name), 
+    write(" pasa el turno por no tener jugadas posibles").
+
 
 
 force_queenBee(Color) :- 

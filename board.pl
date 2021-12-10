@@ -1,7 +1,8 @@
 :- module(board, [add_new_piece/1, get_possible_positions/2, get_board/1,
                   get_possible_moves/2,
                   move_piece/2,
-                  check_win_condition/2
+                  check_win_condition/2,
+                  get_possible_piece_to_move/2
                   ]).
 
 :- use_module(hexagon).
@@ -29,6 +30,13 @@ get_possible_positions(Color, Positions) :-
 
 get_possible_moves(Hex, Moves) :- 
     get_moves(Hex, Moves).
+
+get_possible_piece_to_move([],[]).
+get_possible_piece_to_move([H|Hexs], Pieces) :-
+    get_possible_moves(H, PossibleMoves),
+    get_possible_piece_to_move(Hexs, OldResult),
+    ((length(PossibleMoves, Length), Length =\= 0, Y = [H]); Y = []),
+    append(Y, OldResult, Pieces).
 
 check_win_condition(Turn, Condition) :-
     (Turn > 100, Condition = 2, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));

@@ -58,12 +58,6 @@ move_an_ant(OriginHex, PossibleHexs) :-
     sort(OldPossibleHexs, PossibleHexs),
     new_hex(OriginHex).
 
-    % remove_hex(OriginHex),
-    % get_all_hexs(Hexs),
-    % ((dfs(Hexs), PossibleHexs = PossibleThirdStep);
-    % keep_all_together(Hexs, PossibleThirdStep, PossibleHexs)),
-    % new_hex(OriginHex).
-
 
 get_moves(OriginHex, PossibleDestinies) :- 
     get_hex_bug(OriginHex, Bug),
