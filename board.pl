@@ -1,9 +1,11 @@
-:- module(board, [add_new_piece/1, get_possible_positions/2, get_board/1,
-                  get_possible_moves/2,
-                  move_piece/2,
-                  check_win_condition/2,
-                  get_possible_piece_to_move/2
-                  ]).
+:- module(board, 
+    [   add_new_piece/1, get_possible_positions/2, get_board/1,
+        get_possible_moves/2,
+        move_piece/2,
+        check_win_condition/2,
+        get_possible_piece_to_move/2
+    ]
+).
 
 :- use_module(hexagon).
 :- use_module(player).

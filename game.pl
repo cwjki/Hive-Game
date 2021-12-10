@@ -1,5 +1,4 @@
-:- module(game, [playerVsPC/0,
-                        pcVsPC/0]).
+:- module(game, [playerVsPC/0, pcVsPC/0]).
 
 :- use_module(player).
 :- use_module(utils).

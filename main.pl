@@ -1,6 +1,5 @@
-:- use_module(playerVsPC).
+:- use_module(game).
 :- use_module(hexagon).
-
 
 beginning_message(Input) :- 
     writeln(""),
@@ -17,6 +16,3 @@ main() :-
     (Input =:= 1 -> playerVsPC(), main();
     (Input =:= 2 -> pcVsPC(), main());
     (writeln("Debe seleccionar una de las opciones disponibles"), main())).
-
-
-playerVsPlayer() :- writeln("PVP").

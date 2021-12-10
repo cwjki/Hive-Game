@@ -1,6 +1,10 @@
-:- module(utils, [init_color/0, init_turn/0, get_color/1, get_turn/1,
-                  update_color/1, update_turn/1, 
-                  reverse/3]).
+:- module(utils,
+    [
+        init_color/0, init_turn/0, get_color/1, get_turn/1,
+        update_color/1, update_turn/1, 
+        reverse/3
+    ]
+).
 
 :- dynamic color/1.
 :- dynamic turn/1.
@@ -31,6 +35,4 @@ update_turn(NewTurn) :-
 % TOOLS
 reverse([],Z,Z).
 reverse([H|T],Z,Acc) :- reverse(T,Z,[H|Acc]).
-
-
 
