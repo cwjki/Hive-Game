@@ -8,7 +8,9 @@
                     reachable_path/2,
                     keep_all_together/3,
                     get_hive_empty_neighbours/2,
+                    get_multiple_slidable_neighbours/2,
                     get_multiple_empty_neighbours/2,
+                    get_multiple_neighbours/2,
                     get_slidable_neighbours/2,                 
                     its_slidable/2,
                     get_neighbours/2,
@@ -192,13 +194,27 @@ keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :-
     append(Y,PossibleHexs,NewPossibleHexs). 
 
 
+%devuelve los vecinos de la entrada
+get_multiple_neighbours([], []).
+get_multiple_neighbours([X|PossibleStep], Neighbours) :-
+    get_neighbours(X, SingleNeighbours),
+    get_multiple_neighbours(PossibleStep, OldNeighbours),
+    % findall(M, (member(M, SingleNeighbours), not(member(M, PossibleStep)), M \== X), Result),
+    append(SingleNeighbours, OldNeighbours, Neighbours).
 
-
-%devuelve los vecinos vacios de la entrada
+%devuelve los vecinos vacios
 get_multiple_empty_neighbours([], []).
 get_multiple_empty_neighbours([X|PossibleStep], EmptyNeighbours) :-
-    get_slidable_neighbours(X, SingleEmptyNeighbours),
+    get_empty_neighbours(X, SingleEmptyNeighbours),
     get_multiple_empty_neighbours(PossibleStep, OldEmptyNeighbours),
+    findall(M, (member(M, SingleEmptyNeighbours), not(member(M, PossibleStep)), M \== X), Result),
+    append(Result, OldEmptyNeighbours, EmptyNeighbours).
+
+%devuelve los vecinos vacios deslizables de la entrada
+get_multiple_slidable_neighbours([], []).
+get_multiple_slidable_neighbours([X|PossibleStep], EmptyNeighbours) :-
+    get_slidable_neighbours(X, SingleEmptyNeighbours),
+    get_multiple_slidable_neighbours(PossibleStep, OldEmptyNeighbours),
     findall(M, (member(M, SingleEmptyNeighbours), not(member(M, PossibleStep)), M \== X), Result),
     append(Result, OldEmptyNeighbours, EmptyNeighbours).
 

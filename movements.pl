@@ -34,11 +34,11 @@ move_a_spider(OriginHex, PossibleHexs) :-
     remove_hex(OriginHex),
     get_hive_empty_neighbours(EmptyNeighbours, PossibleFirstStep),
     new_hex(OriginHex),
-    get_multiple_empty_neighbours(PossibleFirstStep, PossibleEmptyFirstNeighbours),
+    get_multiple_slidable_neighbours(PossibleFirstStep, PossibleEmptyFirstNeighbours),
     remove_hex(OriginHex),
     get_hive_empty_neighbours(PossibleEmptyFirstNeighbours, PossibleSecondStep),
     new_hex(OriginHex),
-    get_multiple_empty_neighbours(PossibleSecondStep, PossibleEmptySecondNeighbours),
+    get_multiple_slidable_neighbours(PossibleSecondStep, PossibleEmptySecondNeighbours),
     remove_hex(OriginHex),
     get_hive_empty_neighbours(PossibleEmptySecondNeighbours, PossibleThirdStep),
     findall(H, (member(H, PossibleThirdStep), not(member(H, PossibleFirstStep))), ThirdStep),
@@ -46,6 +46,21 @@ move_a_spider(OriginHex, PossibleHexs) :-
     keep_all_together(Hexs, ThirdStep, OldPossibleHexs),
     sort(OldPossibleHexs, PossibleHexs),
     new_hex(OriginHex).
+
+move_a_ladybug(OriginHex, PossibleHexs) :- 
+    get_neighbours(OriginHex, PossibleFirstStep),
+    remove_hex(OriginHex),
+    get_multiple_neighbours(PossibleFirstStep, OldPossibleSecondStep),
+    sort(OldPossibleSecondStep, PossibleSecondStep),
+    new_hex(OriginHex),
+    get_multiple_empty_neighbours(PossibleSecondStep, PossibleThirdStep),
+    remove_hex(OriginHex),
+    get_all_hexs(Hexs),
+    keep_all_together(Hexs, PossibleThirdStep, OldPossibleHexs),
+    sort(OldPossibleHexs, PossibleHexs),
+    new_hex(OriginHex).
+
+
 
 
 move_an_ant(OriginHex, PossibleHexs) :-
@@ -66,8 +81,9 @@ get_moves(OriginHex, PossibleDestinies) :-
     Bug =:= 3 -> move_a_grasshopper(OriginHex, PossibleDestinies);
     Bug =:= 4 -> move_a_scarab(OriginHex, PossibleDestinies);   
     Bug =:= 5 -> move_a_spider(OriginHex, PossibleDestinies);
-    PossibleDestinies = []
+    
     %  Bug =:= 6 -> move_a_mosquito(OriginHex, PossibleDestinies);
-    %  Bug =:= 7 -> move_a_ladybug(OriginHex, PossibleDestinies);
+    Bug =:= 7 -> move_a_ladybug(OriginHex, PossibleDestinies);
     %  Bug =:= 8 -> move_a_pillbug(OriginHex, PossibleDestinies)
+    PossibleDestinies = []
     ).

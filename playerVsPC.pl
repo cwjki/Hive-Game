@@ -312,6 +312,8 @@ play(Color, Turn) :-
 
 playerVsPC() :- init(), play(0, 1).
 
+pcVsPC() :- init(), play(0, 1).
+
 print_board() :- 
     get_board(Board),
     writeln(""), 
