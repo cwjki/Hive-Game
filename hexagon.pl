@@ -172,8 +172,6 @@ dfs_aux([H|T],Visited, Result) :-
     dfs_aux(ToVisit,[H|Visited], Result).
 
 
-
-
 only_one_hive([H|Hexs]) :- 
     dfs(H, Reachable),
     length(Reachable, RLength),

@@ -85,7 +85,6 @@ can_play(Color, Possibilities) :-
 
 
 check_for_play_new_piece(Color) :-
-    writeln("CHECK PLAY"),
     get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), _),
     (QueenBee > 0; Ants > 0; Grasshoppers > 0; Scarabs > 0; Spiders > 0;
     Mosquitos > 0; Ladybugs > 0; Pillbugs > 0),
@@ -93,7 +92,6 @@ check_for_play_new_piece(Color) :-
 
 
 check_for_move_a_piece(Color) :-
-    writeln("CHECK MoVEs"),
     get_hexs_by_color(Color, Hexs),
     its_the_queen_on_the_table(Color),
     get_possible_piece_to_move(Hexs, Pieces),
@@ -248,8 +246,32 @@ pc_play_new_piece():-
     add_new_piece(hex(Row, Column, Piece, Color, 0)).
 
 
-pc_move_one_piece() :- writeln("Simular PC movio ficha").             
-                       
+
+pc_choose_board_piece(Color, ChoosenPiece) :-
+    get_hexs_by_color(Color, Hexs),
+    get_possible_piece_to_move(Hexs, Pieces),
+    length(Pieces, PLength), Length is PLength + 1,
+    random(1, Length, R),
+    nth1(R, Pieces, ChoosenPiece).
+
+pc_choose_piece_destiny(ChoosenPiece, ChoosenDestiny) :-
+    get_possible_moves(ChoosenPiece, PossibleDestinies),
+    length(PossibleDestinies, PLength), Length is PLength + 1,
+    random(1, Length, R),
+    nth1(R, PossibleDestinies, ChoosenDestiny).
+
+
+pc_move_one_piece() :- 
+    get_color(Color), 
+    pc_choose_board_piece(Color, ChoosenPiece),
+    pc_choose_piece_destiny(ChoosenPiece, ChoosenDestiny),
+    move_piece(ChoosenPiece, ChoosenDestiny),
+    get_player(player(Name, Color, _, _, _, _, _, _, _, _), Current_Player),
+    writeln("El jugador "), write(Name), write("movio la pieza "), write(ChoosenPiece),
+    write("para "), write(ChoosenDestiny), writeln("").
+
+
+
 pc_next_move() :- 
     get_turn(Turn), get_color(Color),
     (Turn =:= 1 -> pc_first_play();
@@ -258,13 +280,16 @@ pc_next_move() :-
     (Color =:= 0, Turn =:= 7, not(its_the_queen_on_the_table(0)) -> force_queenBee(Color));
     (Color =:= 1, Turn =:= 8, not(its_the_queen_on_the_table(1)) -> force_queenBee(Color));
     % si esta puesta la reina generar una de las jugadas aleatorias.
-    (Turn >=  2, its_the_queen_on_the_table(Color)) -> (random(1,2, R),
-    (R =:= 1 -> pc_play_new_piece();
-    R =:= 2 -> pc_move_one_piece()));
-    % solo poner nuevas fichas si no se ha puesto la reina.
-    pc_play_new_piece()
-    ).
-               
+    (can_play(Color, Possibilities),
+    (Turn >=  2,
+    (Possibilities =:= 3 -> (random(1, 3, R),
+        (R =:= 1 -> pc_play_new_piece();
+        R =:= 2 -> pc_move_one_piece()))
+    );
+    (Possibilities =:= 1 -> pc_play_new_piece());
+    (Possibilities =:= 2 -> pc_move_one_piece());
+    (Possibilities =:= 0 -> pass_turn())
+    ))).
 
 
 next_move(Name) :- 
