@@ -167,7 +167,7 @@ dfs(Hex, Result) :-
 dfs_aux([], Visited, Visited) :- !.
 %% Skip elements that are already visited
 dfs_aux([H|T],Visited, Result) :-
-    member(H,Visited),
+    member(H,Visited), !,
     dfs_aux(T,Visited, Result).
 %% Add all neigbors of the head to the toVisit
 dfs_aux([H|T],Visited, Result) :-
@@ -184,7 +184,7 @@ only_one_hive([H|Hexs]) :-
     RLength =:= HLength.
 
 
-keep_all_together(_, [], []).
+keep_all_together(_, [], []) :- !.
 keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :- 
     new_hex(X),
     get_all_hexs(NewHexs),
@@ -202,7 +202,6 @@ get_multiple_neighbours([], []).
 get_multiple_neighbours([X|PossibleStep], Neighbours) :-
     get_neighbours(X, SingleNeighbours),
     get_multiple_neighbours(PossibleStep, OldNeighbours),
-    % findall(M, (member(M, SingleNeighbours), not(member(M, PossibleStep)), M \== X), Result),
     append(SingleNeighbours, OldNeighbours, Neighbours).
 
 %devuelve los vecinos vacios
@@ -235,7 +234,7 @@ reachable_path(Hex, Result) :-
 
 reachable_path_aux([], Visited, Visited) :- !.
 reachable_path_aux([H|T], Visited, Result) :-
-    member(H, Visited),
+    member(H, Visited), !,
     reachable_path_aux(T, Visited, Result).
 reachable_path_aux([H|T], Visited, Result) :-
     not(member(H, Visited)),

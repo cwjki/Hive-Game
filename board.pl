@@ -33,7 +33,7 @@ get_possible_positions(Color, Positions) :-
 get_possible_moves(Hex, Moves) :- 
     get_moves(Hex, Moves).
 
-get_possible_piece_to_move([],[]).
+get_possible_piece_to_move([],[]) :- !.
 get_possible_piece_to_move([H|Hexs], Pieces) :-
     get_possible_moves(H, PossibleMoves),
     get_possible_piece_to_move(Hexs, OldResult),
@@ -42,10 +42,10 @@ get_possible_piece_to_move([H|Hexs], Pieces) :-
 
 
 check_win_condition(Turn, Condition) :-
-    (Turn > 100, Condition = 2, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
-    (check_queen(0), ((check_queen(1), Condition = 2, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
-    Condition = 1, writeln("HA GANADO EL JUGADOR CON LAS FICHAS NEGRAS")));
-    (check_queen(1), Condition = 0, writeln("HA GANADO EL JUGADOR CON LAS FICHAS BLANCAS"));
+    (Turn > 100, Condition = 2, !, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
+    (check_queen(0), ((check_queen(1), Condition = 2, !, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
+    Condition = 1, !, writeln("HA GANADO EL JUGADOR CON LAS FICHAS NEGRAS")));
+    (check_queen(1), Condition = 0, !, writeln("HA GANADO EL JUGADOR CON LAS FICHAS BLANCAS"));
     Condition = 3.
 
     
