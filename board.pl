@@ -40,6 +40,7 @@ get_possible_piece_to_move([H|Hexs], Pieces) :-
     ((length(PossibleMoves, Length), Length =\= 0, Y = [H]); Y = []),
     append(Y, OldResult, Pieces).
 
+
 check_win_condition(Turn, Condition) :-
     (Turn > 100, Condition = 2, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
     (check_queen(0), ((check_queen(1), Condition = 2, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));

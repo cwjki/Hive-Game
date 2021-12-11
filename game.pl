@@ -1,9 +1,37 @@
-:- module(game, [playerVsPC/0, pcVsPC/0]).
+:- module(game, [playerVsPC/0, pcVsPC/0,
+                choose_bug/2,
+                print_board/0]).
 
 :- use_module(player).
 :- use_module(utils).
 :- use_module(board).
 :- use_module(hexagon).
+
+
+choose_bug(Bugs, ChoosenBug) :-
+    get_color(Color),
+    get_player(player(Name, Color, _, _, _, _, _, _, _, _), _),
+    ((Name =:= 0 -> player_choose_bug(Bugs, ChoosenBug));
+     (Name =:= 1 -> pc_choose_bug(Bugs, ChoosenBug))).
+
+player_choose_bug(Bugs, ChoosenBug) :-
+    write("Seleccione como cual bicho desea que se comporte el Mosquito"),
+    (member(1, Bugs) -> writeln("1 - Abeja Reina"); true),
+    (member(2, Bugs) -> writeln("2 - Hormiga") ;true),
+    (member(3, Bugs) -> writeln("3 - Saltamonte") ;true),
+    (member(4, Bugs) -> writeln("4 - Escarabajo") ;true),
+    (member(5, Bugs) -> writeln("5 - Arana") ;true),
+    (member(7, Bugs) -> writeln("7 - Mariquita") ;true),
+    (member(8, Bugs) -> writeln("8 - Bicho Bola") ;true),
+    read(ChoosenBug),
+    writeln("").
+
+pc_choose_bug(Bugs, ChoosenBug) :-
+    length(Bugs, BLength), Length is BLength + 1,
+    random(1, Length, R),
+    nth1(R, Bugs, ChoosenBug),
+    writeln("El Mosquito se comportara como el bicho "), write(ChoosenBug),
+    writeln("").
 
 
 init(Option) :-
