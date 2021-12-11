@@ -1,6 +1,6 @@
 :- use_module(game).
 :- use_module(hexagon).
-
+    
 beginning_message(Input) :- 
     writeln(""),
     writeln("Proyecto I Programacion Declarativa - Olivia Gonzalez Pena, Juan Carlos Casteleiro Wong - C411"),

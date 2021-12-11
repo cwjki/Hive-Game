@@ -64,10 +64,7 @@ check_for_move_a_piece(Color) :-
     Length > 0.
 
 pass_turn() :- 
-    get_player(player(Name, _, _, _, _, _, _, _, _, _), _),
-    writeln("El jugador "), write(Name), 
-    write(" pasa el turno por no tener jugadas posibles").
-
+    writeln("Se pasa el turno por no tener jugadas posibles").
 
 force_queenBee(Color) :- 
     get_player(player(Name, Color, _, _, _, _, _, _, _, _), Current_Player),
@@ -328,9 +325,14 @@ pc_force_queenBee(Color) :-
 
 pc_choose_position(Color, ChoosenHex) :- 
     get_possible_positions(Color, Positions),
-    length(Positions, Length), NewLength is Length + 1,
+    RivalColor is 1 - Color,
+    ((its_the_queen_on_the_table(RivalColor),
+    get_hex(hex(_, _, 1, RivalColor, _), RivalQueen),
+    get_min_distance_hex(Positions, RivalQueen, ChoosenHex)
+    );
+    (length(Positions, Length), NewLength is Length + 1,
     random(1, NewLength, RIndex),
-    nth1(RIndex, Positions, ChoosenHex).
+    nth1(RIndex, Positions, ChoosenHex))).
 
 pc_play_new_piece():- 
     get_color(Color), pc_choose_hand_piece(Piece), pc_choose_position(Color, ChoosenHex),
@@ -347,9 +349,15 @@ pc_choose_board_piece(Color, ChoosenPiece) :-
 
 pc_choose_piece_destiny(ChoosenPiece, ChoosenDestiny) :-
     get_possible_moves(ChoosenPiece, PossibleDestinies),
-    length(PossibleDestinies, PLength), Length is PLength + 1,
-    random(1, Length, R),
-    nth1(R, PossibleDestinies, ChoosenDestiny).
+    get_color(Color),
+    RivalColor is 1 - Color,
+    ((its_the_queen_on_the_table(RivalColor),
+    get_hex(hex(_, _, 1, RivalColor, _), RivalQueen),
+    get_min_distance_hex(PossibleDestinies, RivalQueen, ChoosenHex)
+    );
+    (length(PossibleDestinies, PLength), Length is PLength + 1,
+    random(1, Length, RIndex),
+    nth1(RIndex, PossibleDestinies, ChoosenHex))).    
 
 pc_move_one_piece() :- 
     get_color(Color), 

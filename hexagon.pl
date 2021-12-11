@@ -20,7 +20,8 @@
         dfs/2,
         get_first_empty/5,
         get_possible_hex_by_direction/2,
-        its_the_queen_on_the_table/1
+        its_the_queen_on_the_table/1,
+        get_min_distance_hex/3
     ]
 ).
 
@@ -259,6 +260,25 @@ get_useless_hex_level(uselessHex(_, _, _, _, Level), Level).
 get_useless_hex(uselessHex(Row, Column, Bug, Color, Level), uselessHex(Row, Column, Bug, Color, Level)) :- uselessHex(Row, Column, Bug, Color, Level).
 
 get_all_useless_hexs(UselessHexs) :- findall(Hex, get_useless_hex(_, Hex), UselessHexs).
+
+distance(OriginHex, DestinyHex, Distance) :- 
+    get_hex_row(OriginHex, ORow), get_hex_column(OriginHex, OColumn),
+    get_hex_row(DestinyHex, DRow), get_hex_column(DestinyHex, DColumn),
+    Row is abs(ORow - DRow),
+    Column is abs(OColumn - DColumn),
+    Aux1 is (Row - Column) // 2,
+    Aux2 is max(0, Aux1),
+    Distance is Column + Aux2. 
+
+% dado los posibles destinos y la reina contraria devuelve el destino mas cercano.
+get_min_distance_hex([], QueenHex, QueenHex) :- !.
+get_min_distance_hex([H|PossibleDestinies], QueenHex, MinHex) :-
+    distance(H, QueenHex, Distance),
+    get_min_distance_hex(PossibleDestinies, QueenHex, OldMinHex),
+    distance(OldMinHex, QueenHex, OldDistance),
+    Aux is min(Distance, OldDistance),
+    (((OldMinHex \== QueenHex), ((Distance =:= Aux, MinHex = H); (MinHex = OldMinHex)));
+    (MinHex = H)).
 
 
 its_the_queen_on_the_table(Color) :- 
