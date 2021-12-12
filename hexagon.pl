@@ -21,18 +21,19 @@
         get_first_empty/5,
         get_possible_hex_by_direction/2,
         its_the_queen_on_the_table/1,
-        get_min_distance_hex/3
+        get_min_distance_hex/3,
+        get_all_useless_hexs/1
     ]
 ).
 
 :- dynamic hex/5.
 :- dynamic uselessHex/5.
 
-new_hex(hex(Row, Column, Bug, Color, Level)) :- 
-    not(get_hex(hex(Row, Column, _, _, _), Hex)),
+new_hex(hex(Row, Column, Bug, Color, _)) :- 
+    not(get_hex(hex(Row, Column, _, _, _), _)),
     assertz(hex(Row, Column, Bug, Color, 0)), !.
 
-new_hex(hex(Row, Column, Bug, Color, Level)) :- 
+new_hex(hex(Row, Column, Bug, Color, _)) :- 
     get_hex(hex(Row, Column, OldBug, OldColor, OldLevel), OldHex),
     new_useless_hex(uselessHex(Row, Column, OldBug, OldColor, OldLevel)),
     retract(OldHex),
@@ -78,7 +79,7 @@ get_neighbours_aux(_,[],[],[]).
 get_neighbours_aux(hex(Row, Column, Bug, Color, Level), [X|DirR], [Y|DirC], Neighbours) :- 
     NewRow is Row + X,
     NewColumn is Column + Y,
-    ((get_hex(hex(NewRow, NewColumn, B, C, L), N), !, N_N = [N]);
+    ((get_hex(hex(NewRow, NewColumn, _, _, _), N), !, N_N = [N]);
     (N_N = [])),
     get_neighbours_aux(hex(Row, Column, Bug, Color, Level), DirR, DirC, Old_Neighbours),
     append(N_N,Old_Neighbours, Neighbours).
@@ -93,10 +94,10 @@ get_empty_neighbours_aux(hex(Row, Column, _, _, _), [X|DirR], [Y|DirC], EmptyNei
     NewRow is Row + X,
     NewColumn is Column + Y,
     ((not(get_hex(hex(NewRow, NewColumn, _, _, _),_)),
-    Empty_N = [hex(NewRow, NewColumn, null, null, 0)], !);
+    Empty_N = [hex(NewRow, NewColumn, -1, -1, 0)], !);
     Empty_N = []),
-    get_empty_neighbours_aux(hex(Row, Column, _, _, _), DirR, DirC, Empty_Neighbours),
-    append(Empty_N, Empty_Neighbours, EmptyNeighbours).
+    get_empty_neighbours_aux(hex(Row, Column, _, _, _), DirR, DirC, OldEmptyNeighbours),
+    append(Empty_N, OldEmptyNeighbours, EmptyNeighbours).
 
 
 
@@ -114,7 +115,8 @@ get_possible_neighbours([X|EmptyNeighbours], Color, PossibleNeighbours) :-
     get_neighbours(X, Neighbours),
     find_neighbours_by_color(Neighbours, Color, DistinctNeighbours),
     get_possible_neighbours(EmptyNeighbours, Color, OldPossibleNeighbours),
-    ((DistinctNeighbours = [], !, Y = [X]) ; (Y = [])),
+    length(DistinctNeighbours, Length),
+    ((Length =:= 0, !, Y = [X]) ; (Y = [])),
     append(Y, OldPossibleNeighbours, PossibleNeighbours).
 
 
@@ -134,7 +136,8 @@ get_first_empty(OriginHex, X,Y, Accumulated, Hex) :-
     NewRow is Row + X,
     NewColumn is Column + Y,
     ((get_hex(hex(NewRow, NewColumn, _, _, _), NewOrigin), get_first_empty(NewOrigin, X,Y, Accumulated, Hex));
-    (H = [hex(NewRow, NewColumn, null, null, 0)], append(H, Accumulated, Hex))).
+    (H = [hex(NewRow, NewColumn, -1, -1, 0)], append(H, Accumulated, Hex))).
+
     
 % devuelve todas las casillas donde el Grasshopper puede aterrizar.
 get_possible_hex_by_direction(OriginHex, PossibleHD) :- 
@@ -187,15 +190,19 @@ only_one_hive([H|Hexs]) :-
 
 keep_all_together(_, [], []) :- !.
 keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :- 
+    not(get_hex(X, _)), !,
     new_hex(X),
     get_all_hexs(NewHexs),
-    ((only_one_hive(NewHexs), Y = [X]);
-    Y = []),
-    get_hex_row(X, Row), get_hex_column(X, Column),
-    get_hex(hex(Row, Column, _, _, _), NewX),
-    remove_hex(NewX),
+    ((only_one_hive(NewHexs), Y = [X]); Y = []),
+    remove_hex(X),
     keep_all_together(Hexs, Neighbours, PossibleHexs),
     append(Y,PossibleHexs,NewPossibleHexs). 
+
+keep_all_together(Hexs, [X|Neighbours], NewPossibleHexs) :-
+    ((only_one_hive(Hexs), Y = [X]); Y= []),
+    keep_all_together(Hexs, Neighbours, PossibleHexs),
+    append(Y,PossibleHexs,NewPossibleHexs).
+
 
 
 %devuelve los vecinos de la entrada

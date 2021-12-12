@@ -1,5 +1,5 @@
 :- module(board, 
-    [   add_new_piece/1, get_possible_positions/2, get_board/1,
+    [   add_new_piece/1, get_possible_positions/2, get_board/1, get_useless_board/1,
         get_possible_moves/2,
         move_piece/2,
         check_win_condition/2,
@@ -12,10 +12,11 @@
 :- use_module(movements).
 
 get_board(Board) :- get_all_hexs(Board).
+get_useless_board(Useless) :- get_all_useless_hexs(Useless).
 
 add_new_piece(hex(Row, Column, Bug, Color, Level)) :- 
     get_player(player(_, Color, _, _, _, _, _, _, _, _), Player),
-    update_player_hand(Bug, Player, NewPlayer),
+    update_player_hand(Bug, Player, _),
     new_hex(hex(Row, Column, Bug, Color, Level)).
 
 move_piece(OriginHex, DestinyHex) :- 
@@ -42,10 +43,10 @@ get_possible_piece_to_move([H|Hexs], Pieces) :-
 
 
 check_win_condition(Turn, Condition) :-
-    (Turn > 100, Condition = 2, !, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
-    (check_queen(0), ((check_queen(1), Condition = 2, !, writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
-    Condition = 1, !, writeln("HA GANADO EL JUGADOR CON LAS FICHAS NEGRAS")));
-    (check_queen(1), Condition = 0, !, writeln("HA GANADO EL JUGADOR CON LAS FICHAS BLANCAS"));
+    (Turn > 100, Condition = 2, !,writeln(""), writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
+    (check_queen(0), ((check_queen(1), Condition = 2, !,writeln(""), writeln("LA PARTIDA HA TERMINADO EN EMPATE"));
+    Condition = 1, !,writeln(""), writeln("HA GANADO EL JUGADOR CON LAS FICHAS NEGRAS")));
+    (check_queen(1), Condition = 0, !,writeln(""), writeln("HA GANADO EL JUGADOR CON LAS FICHAS BLANCAS"));
     Condition = 3.
 
     

@@ -67,7 +67,7 @@ move_an_ant(OriginHex, PossibleHexs) :-
     remove_hex(OriginHex),
     reachable_path(OriginHex, AntPath),
     get_hex_row(OriginHex, Row), get_hex_column(OriginHex, Column),
-    findall(H, (member(H, AntPath), get_hex_row(H, HRow), get_hex_column(H, HColumn),(HRow \== Row; HColumn \== Column)), Path),
+    findall(H, (member(H, AntPath), get_hex_row(H, HRow), get_hex_column(H, HColumn), not((HRow =:= Row, HColumn =:= Column))), Path),
     get_all_hexs(Hexs),
     keep_all_together(Hexs, Path, OldPossibleHexs),
     sort(OldPossibleHexs, PossibleHexs),
@@ -126,7 +126,6 @@ get_neighbours_bugs([N|Neighbours], Bugs) :-
     append(Y, OldBugs, Bugs).
 
 
-
 get_moves(OriginHex, PossibleDestinies) :- 
     get_hex_bug(OriginHex, Bug),
     (Bug =:= 1 -> move_a_queen(OriginHex, PossibleDestinies);
@@ -139,42 +138,3 @@ get_moves(OriginHex, PossibleDestinies) :-
     %  Bug =:= 8 -> move_a_pillbug(OriginHex, PossibleDestinies)
     PossibleDestinies = []
     ).
-
-
-
-% move_a_mosquito(OriginHex, PossibleHexs) :- 
-%     get_hex(OriginHex, hex(Row, Column, _, Color, Level)),
-%     remove_hex(OriginHex),
-%     ((Level =:= 0,
-%     (get_neighbours(OriginHex, Neighbours), 
-%     ((length(Neighbours, 1), nth1(1,Neighbours,H), get_hex_bug(H, 6), PossibleHexs = []);
-%     % get_multiple_bug(Neighbours, Bugs),
-%     get_neighbours_bugs(Neighbours, OldBugs),
-%     sort(OldBugs, Bugs),
-%     choose_bug(Bugs, ChoosenBug),
-%     new_hex(hex(Row, Column, ChoosenBug, Color, Level))),
-%     get_moves(hex(Row, Column, ChoosenBug, Color, Level), PossibleHexs),
-%     remove_hex(hex(Row, Column, ChoosenBug, Color, Level))));
-%     (Level > 0, (
-%     new_hex(hex(Row, Column, 4, Color, Level)),
-%     move_a_scarab(hex(Row, Column, 4, Color, Level), PossibleHexs),
-%     remove_hex(hex(Row, Column, 4, Color, Level))))),
-%     new_hex(OriginHex).
-
-% get_multiple_bug([], []) :- !.
-% get_multiple_bug([H|Hexs], Bugs) :-
-%     get_hex_bug(H, Bug),
-%     ((member(Bug, Bugs), Y = []);
-%     (not(member(Bug, Bugs)), Y = [Bug])),
-%     get_multiple_bug(Hexs, OldBugs),
-%     append(Y, OldBugs, Bugs).
-
-% get_mosquito_move(OriginHex, PossibleDestinies) :-
-%     get_hex_bug(OriginHex, Bug),
-%     (Bug =:= 1 -> move_a_queen(OriginHex, PossibleDestinies);
-%     Bug =:= 2 -> move_an_ant(OriginHex, PossibleDestinies);
-%     Bug =:= 3 -> move_a_grasshopper(OriginHex, PossibleDestinies);
-%     Bug =:= 4 -> move_a_scarab(OriginHex, PossibleDestinies);   
-%     Bug =:= 5 -> move_a_spider(OriginHex, PossibleDestinies);
-%     Bug =:= 7 -> move_a_ladybug(OriginHex, PossibleDestinies);
-%     PossibleDestinies = []).

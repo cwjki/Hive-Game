@@ -1,6 +1,8 @@
-:- module(game, [playerVsPC/0, pcVsPC/0,
-                choose_bug/2,
-                print_board/0]).
+:- module(game, [
+    playerVsPC/0, 
+    pcVsPC/0, 
+    playerVsPlayer/0,
+    print_board/0]).
 
 :- use_module(player).
 :- use_module(utils).
@@ -8,35 +10,10 @@
 :- use_module(hexagon).
 
 
-choose_bug(Bugs, ChoosenBug) :-
-    get_color(Color),
-    get_player(player(Name, Color, _, _, _, _, _, _, _, _), _),
-    ((Name =:= 0 -> player_choose_bug(Bugs, ChoosenBug));
-     (Name =:= 1 -> pc_choose_bug(Bugs, ChoosenBug))).
-
-player_choose_bug(Bugs, ChoosenBug) :-
-    write("Seleccione como cual bicho desea que se comporte el Mosquito"),
-    (member(1, Bugs) -> writeln("1 - Abeja Reina"); true),
-    (member(2, Bugs) -> writeln("2 - Hormiga") ;true),
-    (member(3, Bugs) -> writeln("3 - Saltamonte") ;true),
-    (member(4, Bugs) -> writeln("4 - Escarabajo") ;true),
-    (member(5, Bugs) -> writeln("5 - Arana") ;true),
-    (member(7, Bugs) -> writeln("7 - Mariquita") ;true),
-    (member(8, Bugs) -> writeln("8 - Bicho Bola") ;true),
-    read(ChoosenBug),
-    writeln("").
-
-pc_choose_bug(Bugs, ChoosenBug) :-
-    length(Bugs, BLength), Length is BLength + 1,
-    random(1, Length, R),
-    nth1(R, Bugs, ChoosenBug),
-    writeln("El Mosquito se comportara como el bicho "), write(ChoosenBug),
-    writeln("").
-
-
 init(Option) :-
-    ((Option =:= 1, random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)));
-     (Option =:= 2, random(0, 2, R1), new_player(player(1, R1, 1, 3, 3, 2, 2, 1, 1, 1)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 1)))
+    ((Option =:= 1, random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 0)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 0)));
+     (Option =:= 2, random(0, 2, R1), new_player(player(1, R1, 1, 3, 3, 2, 2, 1, 1, 0)), R2 is 1-R1, new_player(player(1, R2, 1, 3, 3, 2, 2, 1, 1, 0)));
+     (Option =:= 3, random(0, 2, R1), new_player(player(0, R1, 1, 3, 3, 2, 2, 1, 1, 0)), R2 is 1-R1, new_player(player(0, R2, 1, 3, 3, 2, 2, 1, 1, 0)))    
     ),
     init_color(),
     init_turn(),
@@ -48,13 +25,13 @@ can_play(Color, Possibilities) :-
     (check_for_move_a_piece(Color), Possibilities = 2);
     Possibilities = 0.
 
-
 check_for_play_new_piece(Color) :-
     get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), _),
     (QueenBee > 0; Ants > 0; Grasshoppers > 0; Scarabs > 0; Spiders > 0;
     Mosquitos > 0; Ladybugs > 0; Pillbugs > 0),
-    get_possible_positions(Color, Positions).
-
+    get_possible_positions(Color, Positions),
+    length(Positions, Length),
+    Length > 0.
 
 check_for_move_a_piece(Color) :-
     get_hexs_by_color(Color, Hexs),
@@ -67,7 +44,7 @@ pass_turn() :-
     writeln("Se pasa el turno por no tener jugadas posibles").
 
 force_queenBee(Color) :- 
-    get_player(player(Name, Color, _, _, _, _, _, _, _, _), Current_Player),
+    get_player(player(Name, Color, _, _, _, _, _, _, _, _), _),
     (Name =:= 0 -> player_force_queenBee(Color);
     pc_force_queenBee(Color)).
 
@@ -77,24 +54,25 @@ next_move(Name) :-
     pc_next_move()).
 
 
-play(Color, Turn) :- 
-    get_player(player(Name, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
+play(Color) :- 
+    get_player(player(Name, Color, _, _, _, _, _, _, _, _), _),
     printInfo(Name, Color),
     write("Tablero antes de jugar"),
-    print_board(), 
-    next_move(Name),
-    write("Tablero despues de jugar"),
-    print_board(),         
+    print_board(),
+    write("Fichas inhabilitadas por tener otra(s) encima"),
+    print_useless_board(), 
+    next_move(Name),        
     update_turn(NewTurn),
     update_color(NewColor),
     check_win_condition(NewTurn, Condition),
-    ((Condition =:= 3, play(NewColor, NewTurn));
+    ((Condition =:= 3, play(NewColor));
     writeln("GRACIAS POR JUGAR")).
     
 
 
-playerVsPC() :- init(1), play(0, 1).
-pcVsPC() :- init(2), play(0, 1).
+playerVsPC() :- init(1), play(0).
+pcVsPC() :- init(2), play(0).
+playerVsPlayer() :- init(3), play(0).
 
 
 %%%% PRINTS %%%%
@@ -102,6 +80,12 @@ print_board() :-
     get_board(Board),
     writeln(""), 
     writeln(Board),
+    writeln("").
+
+print_useless_board() :- 
+    get_useless_board(Useless),
+    writeln(""), 
+    writeln(Useless),
     writeln(""). 
 
 print_neighbours_options(Option) :- 
@@ -116,12 +100,13 @@ print_neighbours_options(Option) :-
 
 printInfo(Name, Color) :- 
     get_turn(Turn),
-    write("Turno # "), write(Turn),
-    write(" Le corresponde jugar a: "),
+    writeln(""),
+    write("Turno # "), writeln(Turn),
+    write("Le corresponde jugar a: "),
     (Name =:= 0 -> write("Jugador"); write("PC")),
     write(", fichas "),
     (Color =:= 0 -> write("Blancas"); write("Negras")),                                             
-    writeln("").
+    writeln(""), writeln("").
 
 print_positions([],Count) :- Count = 0.
 print_positions([X|Positions], NewCount) :- 
@@ -174,7 +159,7 @@ print_move_one_piece(ChoosenPiece, ChoosenDestiny) :-
 
 %%%% PLAYER LOGIC %%%%
 player_choose_hand_piece(Piece) :- 
-    get_color(Color), get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
+    get_color(Color), get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), _),
     writeln("Seleccione que bicho desea agregar al tablero"),
     (QueenBee > 0     -> writeln("1 - Abeja Reina"); true),                         
     (Ants > 0         -> writeln("2 - Hormiga"); true),
@@ -190,7 +175,7 @@ player_choose_hand_piece(Piece) :-
 player_choose_position(Color, ChoosenHex) :- 
     writeln("Seleccione en que coordenadas desea colocar la ficha."),
     get_possible_positions(Color, Positions),
-    print_positions(Positions, TotalOptions),
+    print_positions(Positions, _),
     read(Option),
     reverse(Positions, X, []),
     nth1(Option, X, ChoosenHex),
@@ -200,7 +185,7 @@ player_choose_board_piece(Color, ChoosenHex) :-
     writeln("Seleccione la ficha que desea mover:"),
     get_hexs_by_color(Color, Hexs),
     get_possible_piece_to_move(Hexs, Pieces),
-    print_positions(Pieces, TotalOptions),
+    print_positions(Pieces, _),
     read(Option),
     reverse(Pieces, X, []),
     nth1(Option, X, ChoosenHex),
@@ -215,7 +200,7 @@ player_play_new_piece() :-
 player_choose_piece_destiny(OriginHex, DestinyHex) :-
     writeln("Seleccione la casilla destino para su ficha:"),
     get_possible_moves(OriginHex, PossibleDestinies),
-    print_positions(PossibleDestinies, TotalOptions),
+    print_positions(PossibleDestinies, _),
     read(Option),
     reverse(PossibleDestinies, X, []),
     nth1(Option, X, DestinyHex),
@@ -282,8 +267,7 @@ player_next_move() :-
 
 %%%% PC LOGIC %%%%
 pc_choose_hand_piece(Piece) :- 
-    get_color(Color), get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), Current_Player),
-    HandPieces = [], 
+    get_color(Color), get_player(player(_, Color, QueenBee, Ants, Grasshoppers, Scarabs, Spiders, Mosquitos, Ladybugs, Pillbugs), _),
     ((QueenBee > 0     -> append([1], [], Hand_pieces)); append([], [], Hand_pieces)),
     ((Ants > 0         -> append([2], Hand_pieces, Hand_pieces1)); append([], Hand_pieces, Hand_pieces1)),
     ((Grasshoppers > 0 -> append([3], Hand_pieces1, Hand_pieces2)); append([], Hand_pieces1, Hand_pieces2)),
@@ -353,18 +337,18 @@ pc_choose_piece_destiny(ChoosenPiece, ChoosenDestiny) :-
     RivalColor is 1 - Color,
     ((its_the_queen_on_the_table(RivalColor),
     get_hex(hex(_, _, 1, RivalColor, _), RivalQueen),
-    get_min_distance_hex(PossibleDestinies, RivalQueen, ChoosenHex)
+    get_min_distance_hex(PossibleDestinies, RivalQueen, ChoosenDestiny)
     );
     (length(PossibleDestinies, PLength), Length is PLength + 1,
     random(1, Length, RIndex),
-    nth1(RIndex, PossibleDestinies, ChoosenHex))).    
+    nth1(RIndex, PossibleDestinies, ChoosenDestiny))).    
 
 pc_move_one_piece() :- 
     get_color(Color), 
     pc_choose_board_piece(Color, ChoosenPiece),
     pc_choose_piece_destiny(ChoosenPiece, ChoosenDestiny),
     move_piece(ChoosenPiece, ChoosenDestiny),
-    get_player(player(Name, Color, _, _, _, _, _, _, _, _), Current_Player),
+    get_player(player(_, Color, _, _, _, _, _, _, _, _), _),
     print_move_one_piece(ChoosenPiece, ChoosenDestiny).
 
 pc_next_move() :- 
