@@ -1,4 +1,5 @@
 .vscode/
+img/
 
 *.aux
 *.log
@@ -6,3 +7,4 @@
 *.tex
 *.synctex.gz
 *.fdb_latexmk
+ 
